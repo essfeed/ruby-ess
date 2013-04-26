@@ -4,10 +4,6 @@ module ESS
   describe Channel do
     let(:channel) { Channel.new }
 
-    it 'allows setting of title' do
-      channel.should respond_to(:title=)
-    end
-
     context 'a new channel' do
       it 'should not be valid' do
         channel.should_not be_valid
