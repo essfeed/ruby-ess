@@ -42,7 +42,32 @@ module ESS
 
       it 'should say an invalid parameter is not available' do channel.invalid.should_not be_available end
       it 'should say an invalid parameter is not mandatory' do channel.invalid.should_not be_mandatory end
+    end
 
+    describe "FEED" do
+
+      let(:feed) { DTD::FEED }
+
+      it 'should say the title element is available' do feed.title.should be_available end
+      it 'should say the id element is available' do feed.id.should be_available end
+      it 'should say the access element is available' do feed.access.should be_available end
+      it 'should say the description element is available' do feed.description.should be_available end
+      it 'should say the published element is available' do feed.published.should be_available end
+      it 'should say the uri element is available' do feed.uri.should be_available end
+      it 'should say the updated element is available' do feed.updated.should be_available end
+      it 'should say the tags element is available' do feed.tags.should be_available end
+
+      it 'should say the title element is mandatory' do feed.title.should be_mandatory end
+      it 'should say the id element is mandatory' do feed.id.should be_mandatory end
+      it 'should say the access element is mandatory' do feed.access.should be_mandatory end
+      it 'should say the description element is mandatory' do feed.description.should be_mandatory end
+      it 'should say the published element is mandatory' do feed.published.should be_mandatory end
+      it 'should say the uri element is not mandatory' do feed.uri.should_not be_mandatory end
+      it 'should say the updated element is not mandatory' do feed.updated.should_not be_mandatory end
+      it 'should say the tags element is not mandatory' do feed.tags.should_not be_mandatory end
+
+      it 'should say an invalid parameter is not available' do feed.invalid.should_not be_available end
+      it 'should say an invalid parameter is not mandatory' do feed.invalid.should_not be_mandatory end
     end
   end
 end

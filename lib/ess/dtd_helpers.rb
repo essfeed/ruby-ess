@@ -23,6 +23,10 @@ module ESS
         end
       end
 
+      def available_elements
+        return @desc.keys
+      end
+
       def method_missing m, *args, &block
         if @desc.has_key? m
           return @desc[m]

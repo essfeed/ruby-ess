@@ -11,7 +11,7 @@ module ESS
       if new_text.class == String
         @text = new_text
       else
-        raise TypeError.new "only strings can be used to set the element text"
+        raise TypeError.new "only strings can be used as a value for the element text"
       end
     end
 
@@ -19,6 +19,13 @@ module ESS
     end
 
     private
+
+      def self.add_child_elements *child_names
+        child_names.each do |name|
+          define_element_reader_method_for name
+          define_element_writer_method_for name
+        end
+      end
 
       def self.define_element_reader_method_for element_name
         define_method(element_name) do

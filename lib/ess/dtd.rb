@@ -17,5 +17,14 @@ module ESS
             :generator => :optional,
             :rights    => :optional,
             :feed      => :mandatory })
+    FEED = GroupDesc.new({
+            :title       => :mandatory,
+            :id          => :mandatory,
+            :access      => :mandatory,
+            :description => :mandatory,
+            :published   => :mandatory,
+            :uri         => :optional,
+            :updated     => :optional,
+            :tags        => :optional })
   end
 end
