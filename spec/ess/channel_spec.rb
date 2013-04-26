@@ -2,18 +2,48 @@ require 'spec_helper'
 
 module ESS
   describe Channel do
-    context "when it is a new channel" do
+    let(:channel) { Channel.new }
 
-      let(:channel) { Channel.new }
-      it "should not be valid" do
+    it 'allows setting of title' do
+      channel.should respond_to(:title=)
+    end
+
+    context 'a new channel' do
+      it 'should not be valid' do
         channel.should_not be_valid
       end
-      
-      it "should respond when asked for a title" do channel.should respond_to(:title) end
-      it "should allow setting the channel title" do channel.should respond_to(:title=) end
+    end
 
-      it "should respond when asked for link" do channel.should respond_to(:link) end
-      it "should allow setting the channel link" do channel.should respond_to(:link=) end
+    describe '#title=' do
+      it 'should accept a string' do
+        lambda { channel.title = "An example title" }.should_not raise_error
+      end
+
+      it 'should accept an element object' do
+        lambda { channel.title = Element.new }.should_not raise_error
+      end
+
+      it 'should not allow anything else beside strings and Elements' do
+        expect { channel.title = [] }.to raise_error(TypeError)
+      end
+    end
+
+    describe '#title' do
+      it 'should return nil if no title was specified' do
+        channel.title.should be_nil
+      end
+
+      context 'when title was already set' do
+        before(:each) { channel.title = "An example title" }
+
+        it 'should return an instance of Element' do
+          channel.title.should be_an_instance_of(Element)
+        end
+
+        it 'should return an instance of Element with the message in text' do
+          channel.title.text.should == "An example title"
+        end
+      end
     end
   end
 end
