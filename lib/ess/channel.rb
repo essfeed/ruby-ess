@@ -1,7 +1,7 @@
 module ESS
   class Channel < Element
     def initialize
-      super ESS::DTD::CHANNEL
+      super :channel, ESS::DTD::CHANNEL
     end
   end
 end
