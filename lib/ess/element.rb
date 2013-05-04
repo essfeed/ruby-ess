@@ -1,9 +1,16 @@
+require 'builder'
+
 module ESS
   class Element
+    attr_reader :dtd
 
-    def initialize dtd
+    def initialize name, dtd
       raise "Bad DTD: no attributes description" if !dtd.include? :attributes
       raise "Bad DTD: no tags description" if !dtd.include? :tags
+      @name = name
+      @dtd = dtd
+      @child_tags = {}
+      @attributes = {}
     end
 
     def text text=nil
@@ -16,16 +23,68 @@ module ESS
       end
     end
 
+    def available_tags
+      @dtd[:tags].keys
+    end
+
+    def available_attributes
+      @dtd[:attributes].keys
+    end
+
+    def inspect
+      "#<#{self.class}:#{object_id} text=\"#{@text}\">"
+    end
+
+    def to_xml xml=nil
+      convert_to_string = true if xml.nil?
+      if xml.nil?
+        xml = Builder::XmlMarkup.new
+        xml.instruct! :xml, :encoding => "UTF-8"
+      end
+      xml.tag! @name, @attributes do |p|
+        p.text! @text if !@text.nil?
+        @child_tags.values.each { |tag_list| tag_list.each { |tag| tag.to_xml(p) } }
+      end
+      xml.target! if convert_to_string
+    end
+
+    def method_missing m, *args, &block
+      if available_tags.include? m
+        return assign_tag(m, args, &block)
+      elsif m.to_s.start_with? "add_"
+        tag_name = m[4..-1].to_sym
+        return extend_tag_list(m, args, &block) if available_tags.include?(tag_name)
+      elsif m.to_s.end_with? "_list"
+        tag_name = m[0..-6].to_sym
+        return (@child_tags[tag_name] ||= []) if available_tags.include?(tag_name)
+      elsif m.to_s.end_with? "_attr"
+        attr_name = m[0..-6].to_sym
+        return set_attribute(attr_name, args, &block)
+      end
+      super(m, *args, &block)
+    end
+
     private
 
-      def set_child child_name, new_value
-        if new_value.class == String
-          @children[child_name] = Element.new(new_value)
-        elsif new_value.class == Element
-          @children[child_name] = new_value
-        else
-          raise TypeError.new "only strings and #{Element} objects can be used to set the #{child_name}"
-        end
+      def set_attribute attr_name, args, &block
+        @attributes[attr_name] = args[0] if args.any? && args[0].class == String
+        @attributes[attr_name] ||= ""
+      end
+
+      def assign_tag m, args, &block
+        tag_list = @child_tags[m] ||= [Element.new(m, @dtd[:tags][m][:dtd])]
+        tag_list[0].text(args[0]) if args.any? && args[0].class == String
+        block.call tag_list[0] if block
+        return tag_list[0]
+      end
+
+      def extend_tag_list m, args, &block
+        tag_name = m[4..-1].to_sym
+        new_tag = Element.new(tag_name, @dtd[:tags][tag_name][:dtd])
+        new_tag.text(args[0]) if args.any? && args[0].class == String
+        block.call new_tag if block
+        (@child_tags[tag_name] ||= []).push new_tag
+        return new_tag
       end
   end
 end
