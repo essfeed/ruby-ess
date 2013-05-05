@@ -59,7 +59,7 @@ module ESS
         return (@child_tags[tag_name] ||= []) if available_tags.include?(tag_name)
       elsif m.to_s.end_with? "_attr"
         attr_name = m[0..-6].to_sym
-        return set_attribute(attr_name, args, &block)
+        return set_attribute(attr_name, args, &block) if available_attributes.include? attr_name
       end
       super(m, *args, &block)
     end
@@ -72,16 +72,22 @@ module ESS
       end
 
       def assign_tag m, args, &block
+        arg_hash = {}
+        args.each { |arg| arg_hash = arg if arg.class == Hash }
         tag_list = @child_tags[m] ||= [Element.new(m, @dtd[:tags][m][:dtd])]
         tag_list[0].text(args[0]) if args.any? && args[0].class == String
+        arg_hash.each_pair { |key, value| tag_list[0].send([key, "_attr"].join("").to_sym, value) }
         block.call tag_list[0] if block
         return tag_list[0]
       end
 
       def extend_tag_list m, args, &block
+        arg_hash = {}
+        args.each { |arg| arg_hash = arg if arg.class == Hash }
         tag_name = m[4..-1].to_sym
         new_tag = Element.new(tag_name, @dtd[:tags][tag_name][:dtd])
         new_tag.text(args[0]) if args.any? && args[0].class == String
+        arg_hash.each_pair { |key, value| new_tag.send([key, "_attr"].join("").to_sym, value) }
         block.call new_tag if block
         (@child_tags[tag_name] ||= []).push new_tag
         return new_tag

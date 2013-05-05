@@ -206,11 +206,37 @@ module ESS
           element.xmlns_attr "Example value"
           element.to_xml.should include('<channel xmlns="Example value"></channel>')
         end
+
         it 'should include values for multiple attributes in xml' do
           element.xmlns_attr "xmlns value"
           element.version_attr "Version value"
           element.to_xml.should include('xmlns="xmlns value"')
           element.to_xml.should include('version="Version value"')
+        end
+      end
+    end
+
+    context 'with a child tag with attributes, CATEGORIES tag for example' do
+      let(:element) { Element.new(:categories, DTD::CATEGORIES) }
+
+      describe '#item' do
+        it 'should accept setting of the attribute value in a hash argument' do
+          element.item :type => "competition"
+          element.item.type_attr.should == "competition"
+        end
+
+        it 'should accept setting both text and attributes at the same time' do
+          element.item "Example text", :type => "competition"
+          element.item.type_attr.should == "competition"
+          element.item.text.should == "Example text"
+        end
+      end
+
+      describe '#add_item' do
+        it 'should accept setting both text and attributes in a hash argument at the same time' do
+          element.add_item "Example text", :type => "competition"
+          element.item.type_attr.should == "competition"
+          element.item.text.should == "Example text"
         end
       end
     end
