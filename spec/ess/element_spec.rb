@@ -268,6 +268,20 @@ module ESS
         end
       end
     end
+
+    context 'with attributes with restricted value, for example DATE_ITEM' do
+      let(:element) { Element.new(:item, DTD::DATE_ITEM) }
+
+      it 'should allow valid value for that attribute' do
+        lambda {
+          element.type_attr "standalone"
+        }.should_not raise_error
+      end
+
+      it 'should raise error if an invalid value was used for an attribute' do
+        expect { element.type_attr "bad_value" }.to raise_error
+      end
+    end
   end
 end
 

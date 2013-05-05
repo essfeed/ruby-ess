@@ -13,7 +13,26 @@ module ESS
 
     CATEGORY_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 } },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                          'award',
+                                          'competition',
+                                          'commemoration',
+                                          'conference',
+                                          'concert',
+                                          'diner',
+                                          'entertainment',
+                                          'cocktail',
+                                          'course',
+                                          'exhibition',
+                                          'family',
+                                          'friends',
+                                          'festival',
+                                          'meeting',
+                                          'networking',
+                                          'party',
+                                          'seminar',
+                                          'theme'] } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
@@ -33,13 +52,26 @@ module ESS
 
     DATE_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                          "standalone",
+                                          "recurrent",
+                                          "permanent" ] },
                        :unit => { :mandatory => false,
-                                  :maxoccurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'hour','day','week','month','year'] },
                        :selected_day => { :mandatory => false,
-                                          :max_occurs => 1 },
+                                          :max_occurs => 1,
+                                          :valid_values => [
+                                            'monday','tuesday','wednesday',
+                                            'thursday','friday','saturday',
+                                            'sunday'] },
                        :selected_week => { :mandatory => false,
-                                           :max_occurs => 1 } },
+                                           :max_occurs => 1,
+                                           :valid_values => [
+                                             'first','second','third',
+                                             'fourth','last' ] } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
@@ -62,7 +94,9 @@ module ESS
 
     PLACE_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'fixed','area','moving','virtual'] },
                        :priority => { :mandatory => false,
                                       :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
@@ -117,15 +151,29 @@ module ESS
 
     PRICE_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'standalone','recurrent'] },
                        :mode => { :mandatory => false,
-                                  :max_occurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'fixed','free','invitation',
+                                    'renumerated','prepaid'] },
                        :unit => { :mandatory => false,
-                                  :max_occurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'hour','day','week','month','year'] },
                        :selected_day => { :mandatory => false,
-                                          :max_occurs => 1 },
+                                          :max_occurs => 1,
+                                          :valid_values => [
+                                            'monday','tuesday','wednesday',
+                                            'thursday','friday','saturday',
+                                            'sunday'] },
                        :selected_week => { :mandatory => false,
-                                           :max_occurs => 1 },
+                                           :max_occurs => 1,
+                                           :valid_values => [
+                                             'first','second','third',
+                                             'fourth','last'] },
                        :priority => { :mandatory => false,
                                       :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
@@ -159,7 +207,9 @@ module ESS
 
     MEDIA_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'image','sound','video','website'] },
                        :priority => { :mandatory => false,
                                       :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
@@ -181,7 +231,10 @@ module ESS
 
     PEOPLE_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 } },
+                                  :max_occurs => 1,
+                                  :valid_values => [
+                                    'organizer','performer','attendee',
+                                    'social','author','contributor'] } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
@@ -258,7 +311,9 @@ module ESS
 
     RELATION_ITEM = {
       :attributes => { :type => { :mandatory => false,
-                                  :max_occurs => 1 } },
+                                  :max_occurs => 1,
+                                  :valid_vlaues => [
+                                    'alternative','related','enclosure'] } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
@@ -362,5 +417,8 @@ module ESS
                              :max_occurs => :inf }
       }
     }
+
+    class InvalidValueError < RuntimeError
+    end
   end
 end
