@@ -40,6 +40,7 @@ module ESS
       if xml.nil?
         xml = Builder::XmlMarkup.new
         xml.instruct! :xml, :encoding => "UTF-8"
+        xml.declare! :DOCTYPE, :ess, :PUBLIC, "-//ESS//DTD", "http://essfeed.org/history/0.9/index.dtd"
       end
       xml.tag! @name, @attributes do |p|
         p.text! @text if !@text.nil?
