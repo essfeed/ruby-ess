@@ -4,12 +4,58 @@ module ESS
   module DTD
     include ESS::Postprocessing
 
-    BASIC_ELEMENT = { :attributes => nil, :tags => nil }
+    BASIC_ELEMENT = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsNotNull.new ]
+    }
 
     DESCRIPTION = {
       :attributes => nil,
       :tags => nil,
       :postprocessing_text => [ StripSpecificHTMLTags.new ]
+    }
+
+    BASIC_TIME = {
+      :attributes => nil,
+      :tags => nil,
+      :postprocessing_text => [ ProcessTime.new ]
+    }
+
+    EMAIL = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsValidEmail.new ]
+    }
+
+    URL_ELEMENT = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsValidURL.new ]
+    }
+
+    LATITUDE = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsValidLatitude.new ]
+    }
+
+    LONGITUDE = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsValidLongitude.new ]
+    }
+
+    COUNTRY_CODE = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsValidCountryCode.new ]
+    }
+
+    CURRENCY = {
+      :attributes => nil,
+      :tags => nil,
+      :validation => [ TextIsValidCurrency.new ]
     }
 
     TAGS = {
@@ -90,7 +136,7 @@ module ESS
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
-                 :start => { :dtd => BASIC_ELEMENT,
+                 :start => { :dtd => BASIC_TIME,
                              :mandatory => true,
                              :max_occurs => 1 },
                  :duration => { :dtd => BASIC_ELEMENT,
@@ -119,13 +165,13 @@ module ESS
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
-                 :country_code => { :dtd => BASIC_ELEMENT,
+                 :country_code => { :dtd => COUNTRY_CODE,
                                     :mandatory => false,
                                     :max_occurs => 1 },
                  :country => { :dtd => BASIC_ELEMENT,
                                :mandatory => false,
                                :max_occurs => 1 },
-                 :latitude => { :dtd => BASIC_ELEMENT,
+                 :latitude => { :dtd => LATITUDE,
                                 :mandatory => false,
                                 :max_occurs => 1 },
                  :longitude => { :dtd => BASIC_ELEMENT,
@@ -151,7 +197,9 @@ module ESS
                                    :max_occurs => 1 },
                  :medium_type => { :dtd => BASIC_ELEMENT,
                                    :mandatory => false,
-                                   :max_occurs => 1 },
+                                   :max_occurs => 1,
+                                   :valid_values => [
+                                         'television','radio','internet'] },
                  :kml => { :dtd => BASIC_ELEMENT,
                            :mandatory => false,
                            :max_occurs => 1 }
@@ -203,16 +251,16 @@ module ESS
                  :value => { :dtd => BASIC_ELEMENT,
                              :mandatory => true,
                              :max_occurs => 1 },
-                 :currency => { :dtd => BASIC_ELEMENT,
+                 :currency => { :dtd => CURRENCY,
                                 :mandatory => false,
                                 :max_occurs => 1 },
-                 :start => { :dtd => BASIC_ELEMENT,
+                 :start => { :dtd => BASIC_TIME,
                              :mandatory => false,
                              :max_occurs => 1 },
                  :duration => { :dtd => BASIC_ELEMENT,
                                 :mandatory => false,
                                 :max_occurs => 1 },
-                 :uri => { :dtd => BASIC_ELEMENT,
+                 :uri => { :dtd => URL_ELEMENT,
                            :mandatory => false,
                            :max_occurs => 1 }
       }
@@ -236,7 +284,7 @@ module ESS
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
-                 :uri => { :dtd => BASIC_ELEMENT,
+                 :uri => { :dtd => URL_ELEMENT,
                            :mandatory => true,
                            :max_occurs => 1 }
       }
@@ -273,13 +321,13 @@ module ESS
                  :organization => { :dtd => BASIC_ELEMENT,
                                     :mandatory => false,
                                     :max_occurs => 1 },
-                 :logo => { :dtd => BASIC_ELEMENT,
+                 :logo => { :dtd => URL_ELEMENT,
                             :mandatory => false,
                             :max_occurs => 1 },
-                 :icon => { :dtd => BASIC_ELEMENT,
+                 :icon => { :dtd => URL_ELEMENT,
                             :mandatory => false,
                             :max_occurs => 1 },
-                 :uri => { :dtd => BASIC_ELEMENT,
+                 :uri => { :dtd => URL_ELEMENT,
                            :mandatory => false,
                            :max_occurs => 1 },
                  :address => { :dtd => BASIC_ELEMENT,
@@ -300,7 +348,7 @@ module ESS
                  :country => { :dtd => BASIC_ELEMENT,
                                :mandatory => false,
                                :max_occurs => 1 },
-                 :country_code => { :dtd => BASIC_ELEMENT,
+                 :country_code => { :dtd => COUNTRY_CODE,
                                     :mandatory => false,
                                     :max_occurs => 1 },
                  :email => { :dtd => BASIC_ELEMENT,
@@ -340,7 +388,7 @@ module ESS
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
-                 :uri => { :dtd => BASIC_ELEMENT,
+                 :uri => { :dtd => URL_ELEMENT,
                            :mandatory => true,
                            :max_occurs => 1 },
                  :id => { :dtd => BASIC_ELEMENT,
@@ -374,18 +422,16 @@ module ESS
                   :description => { :dtd => DESCRIPTION,
                                     :mandatory => true,
                                     :max_occurs => 1 },
-                  :published   => { :dtd => BASIC_ELEMENT,
+                  :published   => { :dtd => BASIC_TIME,
                                     :mandatory => true,
-                                    :max_occurs => 1,
-                                    :postprocessing => [ ProcessTime.new ] },
-                  :uri         => { :dtd => BASIC_ELEMENT,
+                                    :max_occurs => 1 },
+                  :uri         => { :dtd => URL_ELEMENT,
                                     :mandatory => false,
                                     :max_occurs => 1,
                                     :postprocessing => [ FeedURI.new ] },
-                  :updated     => { :dtd => BASIC_ELEMENT,
+                  :updated     => { :dtd => BASIC_TIME,
                                     :mandatory => false,
-                                    :max_occurs => 1,
-                                    :postprocessing => [ ProcessTime.new ] },
+                                    :max_occurs => 1 },
                   :tags        => { :dtd => TAGS,
                                     :mandatory => false,
                                     :max_occurs => 1 },
@@ -422,17 +468,20 @@ module ESS
                                      :max_occurs => 1} },
       :tags =>  { :title => { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
-                              :max_occurs => 1} ,
-                  :link  => { :dtd => BASIC_ELEMENT,
+                              :max_occurs => 1,
+                              :postprocessing => [ ChannelTitle.new ] },
+                  :link  => { :dtd => URL_ELEMENT,
                               :mandatory => true,
-                              :max_occurs => 1},
+                              :max_occurs => 1,
+                              :postprocessing => [ ChannelLink.new ] },
                   :id    => { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
-                              :max_occurs => 1 },
-                  :published => { :dtd => BASIC_ELEMENT,
+                              :max_occurs => 1,
+                              :postprocessing => [ ChannelID.new ] },
+                  :published => { :dtd => BASIC_TIME,
                                   :mandatory => true,
                                   :max_occurs => 1 },
-                  :updated => { :dtd => BASIC_ELEMENT,
+                  :updated => { :dtd => BASIC_TIME,
                                 :mandatory => false,
                                 :max_occurs => 1 },
                   :generator => { :dtd => BASIC_ELEMENT,

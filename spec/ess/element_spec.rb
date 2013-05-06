@@ -256,9 +256,9 @@ module ESS
       end
 
       context 'when the element has child elements' do
-        before(:each) { element.title "An example channel" }
+        before(:each) { element.generator "ruby" }
         it 'should return the starting and ending tags, and the same for the child tag' do
-          element.to_xml.should include("<channel><title>An example channel</title></channel>")
+          element.to_xml.should include("<channel><generator>ruby</generator></channel>")
         end
       end
     end
@@ -323,7 +323,7 @@ module ESS
           element.access "PUBLIC"
           element.description "desc"
           element.published Time.now.to_s
-          element.uri "Sample uri"
+          element.uri "http://example.com/"
           element.categories.add_item do |item|
             item.name "A name"
             item.id "An ID"
@@ -431,6 +431,164 @@ module ESS
           desc = "<p> About this feed...  </p> <script src=\"test.js\"></script>"
           element.text desc
           element.text.should == "<p> About this feed...  </p>"
+        end
+      end
+
+      describe 'Channel element' do
+        let(:element) { Element.new(:channel, DTD::CHANNEL) }
+
+        context 'when no id set' do
+          describe '#title' do
+            it 'should automatically set the channel id to a uuid(title)' do
+              a_title = "A title"
+              element.title a_title
+              element.id.text.should == Helpers::uuid(a_title, 'ESSID:')
+            end
+          end
+
+          describe '#add_title' do
+            it 'should automatically set the channel id to a uuid(title)' do
+              a_title = "A title"
+              element.add_title a_title
+              element.id.text.should == Helpers::uuid(a_title, 'ESSID:')
+            end
+          end
+        end
+
+        context 'when id was set' do
+          let(:an_id) { Helpers::uuid("Some text", 'ESSID:') }
+
+          describe '#title' do
+            it 'should not automatically set the channel id to a uuid(title)' do
+              element.id an_id
+              a_title = "A title"
+              element.title a_title
+              element.id.text.should == an_id
+            end
+          end
+
+          describe '#add_title' do
+            it 'should not automatically set the channel id to a uuid(title)' do
+              element.id an_id
+              a_title = "A title"
+              element.add_title a_title
+              element.id.text.should == an_id
+            end
+          end
+        end
+      end
+    end
+
+    describe 'Validation' do
+      context 'an empty element which should not be empty' do
+        let(:element) do
+          element = Element.new :description, DTD::BASIC_ELEMENT
+          element.text "     "
+          element
+        end
+
+        it 'should be invalid'  do
+          element.should_not be_valid
+        end
+
+        it 'should be valid if fixed' do
+          element.text "Sample text"
+          element.should be_valid
+        end
+      end
+
+      context 'an URL element' do
+        let(:element) { Element.new :logo, DTD::URL_ELEMENT }
+
+        it 'should be invalid if a bad URL is set' do
+          element.text "bad url"
+          element.should_not be_valid
+        end
+
+        it 'should be valid if valid URL is set' do
+          element.text "http://Example.com:8000/"
+          element.should be_valid
+        end
+
+        it 'should be valid if valid IP address is set' do
+          element.text "192.168.0.1"
+          element.should be_valid
+        end
+      end
+
+      context 'an latitude element' do
+        let(:element) { Element.new :latitude, DTD::LATITUDE }
+
+        it 'should be invalid if not a floating point number' do
+          element.text "bad"
+          element.should_not be_valid
+        end
+
+        it 'should be invalid if above limits' do
+          element.text "1000.000"
+          element.should_not be_valid
+        end
+
+        it 'should be valid if within limit' do
+          element.text "70.31"
+          element.should be_valid
+        end
+      end
+
+      context 'an longitude element' do
+        let(:element) { Element.new :longitude, DTD::LONGITUDE }
+
+        it 'should be invalid if not a floating point number' do
+          element.text "bad"
+          element.should_not be_valid
+        end
+
+        it 'should be invalid if above limits' do
+          element.text "1000.000"
+          element.should_not be_valid
+        end
+
+        it 'should be valid if within limit' do
+          element.text "90.31"
+          element.should be_valid
+        end
+      end
+
+      context 'a country code element' do
+        let(:element) { Element.new :country_code, DTD::COUNTRY_CODE }
+
+        it 'should be invalid if not a valid country code' do
+          element.text "bad"
+          element.should_not be_valid
+        end
+
+        it 'should be valid if valid country code' do
+          element.text "US"
+          element.should be_valid
+        end
+
+        it 'should be valid if valid country code but lower case is used' do
+          element.text "us"
+          element.should be_valid
+        end
+      end
+
+      context 'a currency element' do
+        let(:element) { Element.new :currency, DTD::CURRENCY }
+
+        it 'should be invalid if not a valid currency' do
+          element.text "bad"
+          element.should_not be_valid
+        end
+
+        it 'should be valid if valid currency' do
+          element.text "USD"
+          element.should be_valid
+        end
+
+        it 'should be valid if valid currency but lower case is used' do
+          element.text "usd"
+          element.should be_valid
         end
       end
     end

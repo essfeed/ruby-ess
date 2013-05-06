@@ -25,11 +25,11 @@ module ESS
         return @text ||= ""
       else
         if @dtd.include? :postprocessing_text
-          puts "Tu sam"
           @dtd[:postprocessing_text].each do |processor|
             text = processor.process text
           end
         end
+        text = text.to_s if text.class != String
         @text = text
       end
     end
@@ -48,6 +48,13 @@ module ESS
     end
 
     def valid?
+      if @dtd.include? :validation
+        begin
+          @dtd[:validation].each { |validator| validator.validate self }
+        rescue
+          return false
+        end
+      end
       if !@dtd[:tags].nil?
         @dtd[:tags].each_pair do |tag_name, tag_desc|
           if tag_desc[:mandatory] && 
