@@ -1,4 +1,6 @@
+require 'time'
 require 'spec_helper'
+require 'ess/helpers'
 
 module ESS
   describe Element do
@@ -38,10 +40,6 @@ module ESS
             }.should_not raise_error
           end
 
-          it 'should accept only strings' do
-            expect { element.text({}) }.to raise_error
-          end
-
           it 'should set the text value of the element to that parameter' do
             element.text "Example text"
             element.text.should == "Example text"
@@ -62,10 +60,6 @@ module ESS
             lambda {
               element.text("Example text")
             }.should_not raise_error
-          end
-
-          it 'should accept only strings' do
-            expect { element.text({}) }.to raise_error
           end
 
           it 'should set the text value of the element to that parameter' do
@@ -280,6 +274,164 @@ module ESS
 
       it 'should raise error if an invalid value was used for an attribute' do
         expect { element.type_attr "bad_value" }.to raise_error
+      end
+    end
+
+    describe '#valid?' do
+      context 'called on an element with one mandatory tag with infinite number' do
+        let(:element) { Element.new :tags, DTD::TAGS }
+
+        it 'should return false if that mandatory tag was not defined' do
+          element.should_not be_valid
+        end
+
+        it 'should return true if there is one mandatory tag defined' do
+          element.tag "Example text"
+          element.should be_valid
+        end
+
+        it 'should return true if there are more then one instances of that tag' do
+          element.add_tag "Example text 1"
+          element.add_tag "Example text 2"
+          element.should be_valid
+        end
+      end
+
+      context 'called on an element with mandatory tags and counter restricted' do
+        let(:element) { Element.new :tags, DTD::RELATION_ITEM }
+
+        it 'should return true if all tags presents and within limits' do
+          element.name "Example name"
+          element.uri "Example uri"
+          element.id "Example id"
+          element.should be_valid
+        end
+        it 'should return false if at least one tag has too many elements' do
+          element.add_name "Example name 1"
+          element.add_name "Example name 2"
+          element.uri "Example uri"
+          element.id "Example id"
+          element.should_not be_valid
+        end
+      end
+
+      context 'when child elements need to be tested too' do
+        let(:element) do
+          element = Element.new :feed, DTD::FEED
+          element.title "A title"
+          element.id "An ID"
+          element.access "PUBLIC"
+          element.description "desc"
+          element.published Time.now.to_s
+          element.uri "Sample uri"
+          element.categories.add_item do |item|
+            item.name "A name"
+            item.id "An ID"
+          end
+          element.dates.add_item do |item|
+            item.name "A name"
+            item.start Time.now.to_s
+          end
+          element.places.add_item do |item|
+            item.name "A name"
+          end
+          element
+        end
+
+        it 'should return true if a valid element was generated' do
+          element.should be_valid
+        end
+
+        it 'should return false if a child of the element is not valid' do
+          # Creating a places item without a name tag to make it invalid
+          element.places.add_item
+          element.should_not be_valid
+        end
+      end
+    end
+
+    describe 'tag valid values' do
+      let(:element) { Element.new :feed, DTD::FEED }
+
+      describe '#access' do
+        it 'should allow PUBLIC and PRIVATE values' do
+          lambda {
+            element.access "PUBLIC"
+            element.access "PRIVATE"
+          }.should_not raise_error
+        end
+
+        it 'should not allow other values' do
+          expect { element.access "bad" }.to raise_error
+        end
+      end
+    end
+
+    describe 'postprocessing' do
+      describe 'Feed element' do
+        let(:element) { Element.new(:feed, DTD::FEED) }
+
+        describe '#title' do
+          it 'should automatically set the feed id to a uuid(title)' do
+            a_title = "A title"
+            element.title a_title
+            element.id.text.should == Helpers::uuid(a_title, 'EVENTID:')
+          end
+        end
+
+        describe '#add_title' do
+          it 'should automatically set the feed id to a uuid(title)' do
+            a_title = "A title"
+            element.add_title a_title
+            element.id.text.should == Helpers::uuid(a_title, 'EVENTID:')
+          end
+        end
+
+        describe '#uri' do
+          it 'should automatically set the feed id to a uuid(uri)' do
+            an_uri = "http://event/uri/"
+            element.uri an_uri
+            element.id.text.should == Helpers::uuid(an_uri, 'EVENTID:')
+          end
+        end
+
+        describe '#add_uri' do
+          it 'should automatically set the feed id to a uuid(uri)' do
+            an_uri = "http://event/uri/"
+            element.add_uri an_uri
+            element.id.text.should == Helpers::uuid(an_uri, 'EVENTID:')
+          end
+        end
+
+        describe '#id' do
+          it 'should replace id with a regular event uuid when receiving regular text' do
+            element.id "Some text"
+            element.id.text.should == Helpers::uuid("Some text", 'EVENTID:')
+          end
+        end
+
+        describe '#published' do
+          it 'should accept Time objects and return a string in ISO8601 format' do
+            current_time = Time.now
+            element.published current_time
+            element.published.text.should == current_time.iso8601
+          end
+
+          it 'should accept string in ISO8601 format and keep them the same' do
+            current_time = Time.now.iso8601
+            element.published current_time
+            element.published.text.should == current_time
+          end
+        end
+      end
+
+      describe 'Description element' do
+        let(:element) { Element.new :description, DTD::DESCRIPTION }
+        it 'should strip unwanted tags from the description' do
+          desc = "<p> About this feed...  </p> <script src=\"test.js\"></script>"
+          element.text desc
+          element.text.should == "<p> About this feed...  </p>"
+        end
       end
     end
   end

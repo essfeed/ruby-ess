@@ -1,7 +1,10 @@
 require 'builder'
+require 'ess/helpers'
 
 module ESS
   class Element
+    include ESS::Helpers
+
     attr_reader :dtd
 
     def initialize name, dtd
@@ -13,17 +16,26 @@ module ESS
       @attributes = {}
     end
 
+    def name!
+      @name
+    end
+
     def text text=nil
       if text.nil?
         return @text ||= ""
-      elsif text.class == String
-        @text = text
       else
-        raise TypeError.new "Only strings can be used as a value for the element text"
+        if @dtd.include? :postprocessing_text
+          puts "Tu sam"
+          @dtd[:postprocessing_text].each do |processor|
+            text = processor.process text
+          end
+        end
+        @text = text
       end
     end
 
     def available_tags
+      return [] if @dtd[:tags].nil?
       @dtd[:tags].keys
     end
 
@@ -33,6 +45,31 @@ module ESS
 
     def inspect
       "#<#{self.class}:#{object_id} text=\"#{@text}\">"
+    end
+
+    def valid?
+      if !@dtd[:tags].nil?
+        @dtd[:tags].each_pair do |tag_name, tag_desc|
+          if tag_desc[:mandatory] && 
+                (!@child_tags.include?(tag_name) || @child_tags[tag_name].length == 0)
+            return false
+          end
+          if tag_desc[:max_occurs] != :inf &&
+                (@child_tags.include?(tag_name) && @child_tags[tag_name].length != 0)
+            if tag_desc[:max_occurs].to_i < @child_tags[tag_name].length
+              return false
+            end
+          end
+          child_tags_valid = @child_tags.values.map do |a_tags_list|
+            tags_in_list_valid = a_tags_list.map do |one_tag|
+              one_tag.valid?
+            end
+            tags_in_list_valid.all?
+          end
+          return false if !child_tags_valid.all?
+        end
+      end
+      return true
     end
 
     def to_xml xml=nil
@@ -83,9 +120,17 @@ module ESS
         arg_hash = {}
         args.each { |arg| arg_hash = arg if arg.class == Hash }
         tag_list = @child_tags[m] ||= [Element.new(m, @dtd[:tags][m][:dtd])]
-        tag_list[0].text(args[0]) if args.any? && args[0].class == String
+        if args.length > 0 && args[0].class != Hash
+          if @dtd[:tags][m].include? :valid_values
+            unless @dtd[:tags][m][:valid_values].include?(args[0])
+              raise InvalidValueError, "\"#{args[0]}\" is not a valid value for the #{m} tag"
+            end
+          end
+          tag_list[0].text(args[0])
+        end
         arg_hash.each_pair { |key, value| tag_list[0].send([key, "_attr"].join("").to_sym, value) }
         block.call tag_list[0] if block
+        run_post_processing tag_list[0]
         return tag_list[0]
       end
 
@@ -98,7 +143,14 @@ module ESS
         arg_hash.each_pair { |key, value| new_tag.send([key, "_attr"].join("").to_sym, value) }
         block.call new_tag if block
         (@child_tags[tag_name] ||= []).push new_tag
+        run_post_processing new_tag
         return new_tag
+      end
+
+      def run_post_processing tag
+        if @dtd[:tags][tag.name!].keys.include? :postprocessing
+          @dtd[:tags][tag.name!][:postprocessing].each { |processor| processor.process(self, tag) }
+        end
       end
   end
 end

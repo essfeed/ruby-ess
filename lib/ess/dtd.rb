@@ -1,18 +1,27 @@
+require 'ess/postprocessing'
+
 module ESS
   module DTD
+    include ESS::Postprocessing
 
     BASIC_ELEMENT = { :attributes => nil, :tags => nil }
+
+    DESCRIPTION = {
+      :attributes => nil,
+      :tags => nil,
+      :postprocessing_text => [ StripSpecificHTMLTags.new ]
+    }
 
     TAGS = {
       :attributes => nil,
       :tags => { :tag => { :dtd => BASIC_ELEMENT,
-                           :mandatory => false,
+                           :mandatory => true,
                            :max_occurs => :inf }
       }
     }
 
     CATEGORY_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                           'award',
@@ -32,12 +41,14 @@ module ESS
                                           'networking',
                                           'party',
                                           'seminar',
-                                          'theme'] } },
+                                          'theme'] },
+                       :priority => { :mandatory => false,
+                                      :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
                  :id   => { :dtd => BASIC_ELEMENT,
-                            :mandatory => true,
+                            :mandatory => false,
                             :max_occurs => 1 }
       }
     }
@@ -51,7 +62,7 @@ module ESS
     }
 
     DATE_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                           "standalone",
@@ -61,12 +72,16 @@ module ESS
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'hour','day','week','month','year'] },
+                       :limit => { :mandatory => false,
+                                   :max_occurs => 1 },
+                       :interval => { :mandatory => false,
+                                      :max_occurs => 1 },
                        :selected_day => { :mandatory => false,
                                           :max_occurs => 1,
                                           :valid_values => [
-                                            'monday','tuesday','wednesday',
-                                            'thursday','friday','saturday',
-                                            'sunday'] },
+                                            'number','monday','tuesday',
+                                            'wednesday','thursday','friday',
+                                            'saturday','sunday'] },
                        :selected_week => { :mandatory => false,
                                            :max_occurs => 1,
                                            :valid_values => [
@@ -93,10 +108,12 @@ module ESS
     }
 
     PLACE_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'fixed','area','moving','virtual'] },
+                       :moving_position => { :mandatory => false,
+                                             :max_occurs => 1 },
                        :priority => { :mandatory => false,
                                       :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
@@ -150,7 +167,7 @@ module ESS
     }
 
     PRICE_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'standalone','recurrent'] },
@@ -163,12 +180,16 @@ module ESS
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'hour','day','week','month','year'] },
+                       :limit => { :mandatory => false,
+                                   :max_occurs => 1 },
+                       :interval => { :mandatory => false,
+                                      :max_occurs => 1 },
                        :selected_day => { :mandatory => false,
                                           :max_occurs => 1,
                                           :valid_values => [
-                                            'monday','tuesday','wednesday',
-                                            'thursday','friday','saturday',
-                                            'sunday'] },
+                                            'number','monday','tuesday',
+                                            'wednesday','thursday','friday',
+                                            'saturday','sunday'] },
                        :selected_week => { :mandatory => false,
                                            :max_occurs => 1,
                                            :valid_values => [
@@ -206,7 +227,7 @@ module ESS
     }
 
     MEDIA_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'image','sound','video','website'] },
@@ -230,11 +251,13 @@ module ESS
     }
 
     PEOPLE_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'organizer','performer','attendee',
-                                    'social','author','contributor'] } },
+                                    'social','author','contributor'] },
+                       :priority => { :mandatory => true,
+                                      :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
@@ -310,7 +333,7 @@ module ESS
     }
 
     RELATION_ITEM = {
-      :attributes => { :type => { :mandatory => false,
+      :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_vlaues => [
                                     'alternative','related','enclosure'] } },
@@ -338,25 +361,31 @@ module ESS
       :attributes => nil,
       :tags =>  { :title => { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
-                              :max_occurs => 1},
+                              :max_occurs => 1,
+                              :postprocessing => [ FeedTitle.new ] },
                   :id =>    { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
-                              :max_occurs => 1 },
+                              :max_occurs => 1,
+                              :postprocessing => [ FeedID.new ] },
                   :access => { :dtd => BASIC_ELEMENT,
                                :mandatory => true,
-                               :max_occurs => 1},
-                  :description => { :dtd => BASIC_ELEMENT,
+                               :max_occurs => 1,
+                               :valid_values => ['PUBLIC','PRIVATE'] },
+                  :description => { :dtd => DESCRIPTION,
                                     :mandatory => true,
                                     :max_occurs => 1 },
                   :published   => { :dtd => BASIC_ELEMENT,
                                     :mandatory => true,
-                                    :max_occurs => 1 },
+                                    :max_occurs => 1,
+                                    :postprocessing => [ ProcessTime.new ] },
                   :uri         => { :dtd => BASIC_ELEMENT,
                                     :mandatory => false,
-                                    :max_occurs => 1 },
+                                    :max_occurs => 1,
+                                    :postprocessing => [ FeedURI.new ] },
                   :updated     => { :dtd => BASIC_ELEMENT,
                                     :mandatory => false,
-                                    :max_occurs => 1 },
+                                    :max_occurs => 1,
+                                    :postprocessing => [ ProcessTime.new ] },
                   :tags        => { :dtd => TAGS,
                                     :mandatory => false,
                                     :max_occurs => 1 },
