@@ -114,13 +114,19 @@ module ESS
       def set_attribute attr_name, args, &block
         attr_value = nil
         attr_value = args[0] if args.any? && args[0].class == String
-        if !attr_value.nil? && @dtd[:attributes][attr_name].has_key?(:valid_values)
-          if !@dtd[:attributes][attr_name][:valid_values].include? attr_value
-            raise DTD::InvalidValueError, "Invalid attribute value \"#{attr_value}\" for :#{attr_name} attribute"
-          end
-        end
+        check_attribute attr_name, attr_value
         @attributes[attr_name] = attr_value if !attr_value.nil?
         @attributes[attr_name] ||= ""
+      end
+
+      def check_attribute attr_name, attr_value
+        if !attr_value.nil? && @dtd[:attributes][attr_name].has_key?(:valid_values)
+          if !@dtd[:attributes][attr_name][:valid_values].include? attr_value
+            unless attr_value.split(",").map { |value| @dtd[:attributes][attr_name][:valid_values].include? value }.all?
+              raise DTD::InvalidValueError, "Invalid attribute value \"#{attr_value}\" for :#{attr_name} attribute"
+            end
+          end
+        end
       end
 
       def assign_tag m, args, &block

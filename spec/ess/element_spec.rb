@@ -275,6 +275,18 @@ module ESS
       it 'should raise error if an invalid value was used for an attribute' do
         expect { element.type_attr "bad_value" }.to raise_error
       end
+
+      it 'should allow multiple comma separated valid values' do
+        lambda {
+          element.selected_day_attr "friday,saturday"
+        }.should_not raise_error
+      end
+
+      it 'should raise error if one value is valid and the other is not' do
+        expect {
+          element.selected_day_attr "friday,bad"
+        }.to raise_error
+      end
     end
 
     describe '#valid?' do
