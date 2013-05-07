@@ -166,8 +166,8 @@ module ESS
       end
     end
 
-    context 'with attributes, CHANNEL tag for example' do
-      let(:element) { Element.new(:channel, DTD::CHANNEL) }
+    context 'with attributes, ESS tag for example' do
+      let(:element) { Element.new(:ess, DTD::ESS) }
 
       describe '#available_attributes' do
         it 'should return the list of attributes valid for that element' do
@@ -198,7 +198,7 @@ module ESS
       describe '#to_xml' do
         it 'should include the attribute value in xml' do
           element.xmlns_attr "Example value"
-          element.to_xml.should include('<channel xmlns="Example value"></channel>')
+          element.to_xml.should include('<ess xmlns="Example value"></ess>')
         end
 
         it 'should include values for multiple attributes in xml' do

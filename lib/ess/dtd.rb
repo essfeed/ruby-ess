@@ -460,12 +460,7 @@ module ESS
     }
 
     CHANNEL = {
-      :attributes => { :xmlns   => { :mandatory => true,
-                                     :max_occurs => 1},
-                       :version => { :mandatory => true,
-                                     :max_occurs => 1},
-                       :lang    => { :mandatory => true,
-                                     :max_occurs => 1} },
+      :attributes => nil,
       :tags =>  { :title => { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
                               :max_occurs => 1,
@@ -493,6 +488,19 @@ module ESS
                   :feed => { :dtd => FEED,
                              :mandatory => true,
                              :max_occurs => :inf }
+      }
+    }
+
+    ESS = {
+      :attributes => { :xmlns   => { :mandatory => true,
+                                     :max_occurs => 1},
+                       :version => { :mandatory => true,
+                                     :max_occurs => 1},
+                       :lang    => { :mandatory => true,
+                                     :max_occurs => 1} },
+      :tags => { :channel => { :dtd => CHANNEL,
+                               :mandatory => true,
+                               :max_occurs => 1 }
       }
     }
 

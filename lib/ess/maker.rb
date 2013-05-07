@@ -8,13 +8,13 @@ module ESS
 
     def self.make options={}, &block
       options = DEFAULT_OPTIONS.merge options
-      channel = Channel.new
-      channel.xmlns_attr "http://essfeed.org/history/#{options[:version]}"
-      channel.version_attr options[:version]
-      channel.lang_attr options[:lang]
-      block.call(channel) if block
-      raise RuntimeError, "The resulting ESS channel is not valid" unless !options[:validate] || channel.valid?
-      return channel
+      ess = ESS.new
+      ess.xmlns_attr "http://essfeed.org/history/#{options[:version]}"
+      ess.version_attr options[:version]
+      ess.lang_attr options[:lang]
+      block.call(ess) if block
+      raise RuntimeError, "The resulting ESS channel is not valid" unless !options[:validate] || ess.valid?
+      return ess
     end
   end
 end
