@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = ESS::VERSION
   gem.authors       = ["Marjan Povolni"]
   gem.email         = ["marian.povolny@gmail.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{Generate and parse ESS XML feeds with Ruby}
+  gem.description   = %q{Helper classes and methods for creating ESS XML feeds with Ruby.}
+  gem.summary       = %q{Generate ESS XML feeds with Ruby}
   gem.homepage      = "https://github.com/essfeed/ruby-ess"
 
   gem.files         = `git ls-files`.split($/)

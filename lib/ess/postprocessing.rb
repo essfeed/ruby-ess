@@ -38,8 +38,8 @@ module ESS
     end
 
     class ChannelLink
-      def process channel_tag, id_tag
-        channel_tag.id(title_tag.text)
+      def process channel_tag, link_tag
+        channel_tag.id(link_tag.text)
       end
     end
 
