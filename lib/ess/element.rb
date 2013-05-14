@@ -39,7 +39,7 @@ module ESS
       @dtd[:tags].keys
     end
 
-    def available_attributes
+    def available_attributes!
       @dtd[:attributes].keys
     end
 
@@ -114,7 +114,7 @@ module ESS
         return (@child_tags[tag_name] ||= []) if available_tags!.include?(tag_name)
       elsif m.to_s.end_with? "_attr"
         attr_name = m[0..-6].to_sym
-        return set_attribute(attr_name, args, &block) if available_attributes.include? attr_name
+        return set_attribute(attr_name, args, &block) if available_attributes!.include? attr_name
       end
       super(m, *args, &block)
     end

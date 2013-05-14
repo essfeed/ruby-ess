@@ -171,7 +171,7 @@ module ESS
 
       describe '#available_attributes' do
         it 'should return the list of attributes valid for that element' do
-          attr_list = element.available_attributes
+          attr_list = element.available_attributes!
           attr_list.should include(:xmlns)
           attr_list.should include(:version)
           attr_list.should include(:lang)
