@@ -20,7 +20,7 @@ module ESS
       @name
     end
 
-    def text text=nil
+    def text! text=nil
       if text.nil?
         return @text ||= ""
       else
@@ -149,7 +149,7 @@ module ESS
               raise InvalidValueError, "\"#{args[0]}\" is not a valid value for the #{m} tag"
             end
           end
-          tag_list[0].text(args[0])
+          tag_list[0].text!(args[0])
         end
         arg_hash.each_pair { |key, value| tag_list[0].send([key, "_attr"].join("").to_sym, value) }
         block.call tag_list[0] if block
@@ -162,7 +162,7 @@ module ESS
         args.each { |arg| arg_hash = arg if arg.class == Hash }
         tag_name = m[4..-1].to_sym
         new_tag = Element.new(tag_name, @dtd[:tags][tag_name][:dtd])
-        new_tag.text(args[0]) if args.any? && args[0].class == String
+        new_tag.text!(args[0]) if args.any? && args[0].class == String
         arg_hash.each_pair { |key, value| new_tag.send([key, "_attr"].join("").to_sym, value) }
         block.call new_tag if block
         (@child_tags[tag_name] ||= []).push new_tag

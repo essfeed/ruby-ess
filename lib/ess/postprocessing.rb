@@ -5,41 +5,41 @@ module ESS
   module Postprocessing
     class FeedTitle
       def process feed_tag, title_tag
-        feed_tag.id(title_tag.text)
+        feed_tag.id(title_tag.text!)
       end
     end
 
     class FeedURI
       def process feed_tag, uri_tag
-        feed_tag.id(uri_tag.text)
+        feed_tag.id(uri_tag.text!)
       end
     end
 
     class FeedID
       def process feed_tag, id_tag
-        unless id_tag.text.start_with?('EVENTID:')
-          id_tag.text(Helpers::uuid(id_tag.text, 'EVENTID:'))
+        unless id_tag.text!.start_with?('EVENTID:')
+          id_tag.text!(Helpers::uuid(id_tag.text!, 'EVENTID:'))
         end
       end
     end
 
     class ChannelTitle
       def process channel_tag, title_tag
-        channel_tag.id(title_tag.text) if channel_tag.id.text == ""
+        channel_tag.id(title_tag.text!) if channel_tag.id.text! == ""
       end
     end
 
     class ChannelID
       def process channel_tag, id_tag
-        unless id_tag.text.start_with?('ESSID:') || id_tag.text == ""
-          id_tag.text(Helpers::uuid(id_tag.text, 'ESSID:'))
+        unless id_tag.text!.start_with?('ESSID:') || id_tag.text! == ""
+          id_tag.text!(Helpers::uuid(id_tag.text!, 'ESSID:'))
         end
       end
     end
 
     class ChannelLink
       def process channel_tag, link_tag
-        channel_tag.id(link_tag.text)
+        channel_tag.id(link_tag.text!)
       end
     end
 
@@ -66,7 +66,7 @@ module ESS
 
     class TextIsNotNull
       def validate tag
-        if tag.text.strip == ''
+        if tag.text!.strip == ''
           raise InvalidValueError, "the <#{tag.tag_name}> element cannot be empty"
         end
       end
@@ -79,9 +79,9 @@ module ESS
 
     class TextIsValidURL
       def validate tag
-        unless tag.text =~ /^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i || tag.text.length > 10
-          unless isValidIP tag.text
-            raise InvalidValueError, "invalid URL: #{tag.text}"
+        unless tag.text! =~ /^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i || tag.text!.length > 10
+          unless isValidIP tag.text!
+            raise InvalidValueError, "invalid URL: #{tag.text!}"
           end
         end
       end
@@ -97,16 +97,16 @@ module ESS
 
     class TextIsValidLatitude
       def validate tag
-        unless tag.text =~ /^-?([0-8]?[0-9]|90)\.[0-9]{1,6}$/
-          raise InvalidValueError, "invalid latitude: #{tag.text}"
+        unless tag.text! =~ /^-?([0-8]?[0-9]|90)\.[0-9]{1,6}$/
+          raise InvalidValueError, "invalid latitude: #{tag.text!}"
         end
       end
     end
 
     class TextIsValidLongitude
       def validate tag
-        unless tag.text =~ /^-?((1?[0-7]?|[0-9]?)[0-9]|180)\.[0-9]{1,6}$/
-          raise InvalidValueError, "invalid longitude: #{tag.text}"
+        unless tag.text! =~ /^-?((1?[0-7]?|[0-9]?)[0-9]|180)\.[0-9]{1,6}$/
+          raise InvalidValueError, "invalid longitude: #{tag.text!}"
         end
       end
     end
@@ -364,8 +364,8 @@ module ESS
       }
 
       def validate tag
-        unless COUNTRY_CODES.keys.include? tag.text.strip.upcase
-          raise InvalidValueError, "invalid country code: #{tag.text}"
+        unless COUNTRY_CODES.keys.include? tag.text!.strip.upcase
+          raise InvalidValueError, "invalid country code: #{tag.text!}"
         end
       end
     end
@@ -615,8 +615,8 @@ module ESS
       }
 
       def validate tag
-        unless CURRENCIES.values.include? tag.text.strip.upcase
-          raise InvalidValueError, "invalid currency: #{tag.text}"
+        unless CURRENCIES.values.include? tag.text!.strip.upcase
+          raise InvalidValueError, "invalid currency: #{tag.text!}"
         end
       end
     end

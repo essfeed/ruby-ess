@@ -24,47 +24,47 @@ module ESS
       end
     end
 
-    describe '#text' do
+    describe '#text!' do
       let(:element) { Element.new(:tag_name, {:attributes => "", :tags => ""}) }
 
       context 'when text was not preset' do
         context 'without parameters' do
           it 'should return an empty string' do
-            element.text.should == ""
+            element.text!.should == ""
           end
         end
         context 'with parameters' do
           it 'should accept one parameter' do
             lambda {
-              element.text("Example text")
+              element.text!("Example text")
             }.should_not raise_error
           end
 
           it 'should set the text value of the element to that parameter' do
-            element.text "Example text"
-            element.text.should == "Example text"
+            element.text! "Example text"
+            element.text!.should == "Example text"
           end
         end
       end
 
       context 'when text was preset' do
-        before(:each) { element.text "Example text" }
+        before(:each) { element.text! "Example text" }
 
         context 'without parameters' do
           it 'should return that text' do
-            element.text.should == "Example text"
+            element.text!.should == "Example text"
           end
         end
         context 'with parameters' do
           it 'should accept one parameter' do
             lambda {
-              element.text("Example text")
+              element.text!("Example text")
             }.should_not raise_error
           end
 
           it 'should set the text value of the element to that parameter' do
-            element.text "Example text"
-            element.text.should == "Example text"
+            element.text! "Example text"
+            element.text!.should == "Example text"
           end
         end
       end
@@ -84,7 +84,7 @@ module ESS
           it 'should return an Element instance with a proper DTD and no text' do
             element.tag.class.should == Element
             element.tag.dtd.should == DTD::BASIC_ELEMENT
-            element.tag.text.should == ""
+            element.tag.text!.should == ""
           end
         end
 
@@ -98,16 +98,16 @@ module ESS
         context 'called with a string' do
           it 'should set the new elements text with that value' do
             element.tag "Example text"
-            element.tag.text.should == "Example text"
+            element.tag.text!.should == "Example text"
           end
         end
 
         context 'called with a block' do
           it 'should yield that block with the "tag" element as an argument' do
             lambda {
-              element.tag { |tag| tag.text "Example text" }
+              element.tag { |tag| tag.text! "Example text" }
             }.should_not raise_error
-            element.tag.text.should == "Example text"
+            element.tag.text!.should == "Example text"
           end
         end
       end
@@ -132,7 +132,7 @@ module ESS
         context 'when no tags preset' do
           it 'should create that one tag' do
             element.add_tag "Example text"
-            element.tag.text.should == "Example text"
+            element.tag.text!.should == "Example text"
             element.tag_list.length.should == 1
           end
         end
@@ -142,17 +142,17 @@ module ESS
           it 'should add another tag of the same type' do
             element.add_tag "Example text 2"
             element.tag_list.length.should == 2
-            element.tag_list[0].text.should == "Example text 1"
-            element.tag_list[1].text.should == "Example text 2"
+            element.tag_list[0].text!.should == "Example text 1"
+            element.tag_list[1].text!.should == "Example text 2"
           end
         end
 
         context 'called with a block' do
           it 'should yield that block with the new "tag" element as an argument' do
             lambda {
-              element.add_tag { |tag| tag.text "Example text" }
+              element.add_tag { |tag| tag.text! "Example text" }
             }.should_not raise_error
-            element.tag.text.should == "Example text"
+            element.tag.text!.should == "Example text"
           end
         end
       end
@@ -222,7 +222,7 @@ module ESS
         it 'should accept setting both text and attributes at the same time' do
           element.item "Example text", :type => "competition"
           element.item.type_attr.should == "competition"
-          element.item.text.should == "Example text"
+          element.item.text!.should == "Example text"
         end
       end
 
@@ -230,7 +230,7 @@ module ESS
         it 'should accept setting both text and attributes in a hash argument at the same time' do
           element.add_item "Example text", :type => "competition"
           element.item.type_attr.should == "competition"
-          element.item.text.should == "Example text"
+          element.item.text!.should == "Example text"
         end
       end
     end
@@ -249,7 +249,7 @@ module ESS
       end
 
       context 'when the element has text preset' do
-        before(:each) { element.text "Example text" }
+        before(:each) { element.text! "Example text" }
         it 'should return the starting and ending tags with the text between them' do
           element.to_xml.should include("<channel>Example text</channel>")
         end
@@ -387,7 +387,7 @@ module ESS
           it 'should automatically set the feed id to a uuid(title)' do
             a_title = "A title"
             element.title a_title
-            element.id.text.should == Helpers::uuid(a_title, 'EVENTID:')
+            element.id.text!.should == Helpers::uuid(a_title, 'EVENTID:')
           end
         end
 
@@ -395,7 +395,7 @@ module ESS
           it 'should automatically set the feed id to a uuid(title)' do
             a_title = "A title"
             element.add_title a_title
-            element.id.text.should == Helpers::uuid(a_title, 'EVENTID:')
+            element.id.text!.should == Helpers::uuid(a_title, 'EVENTID:')
           end
         end
 
@@ -403,7 +403,7 @@ module ESS
           it 'should automatically set the feed id to a uuid(uri)' do
             an_uri = "http://event/uri/"
             element.uri an_uri
-            element.id.text.should == Helpers::uuid(an_uri, 'EVENTID:')
+            element.id.text!.should == Helpers::uuid(an_uri, 'EVENTID:')
           end
         end
 
@@ -411,14 +411,14 @@ module ESS
           it 'should automatically set the feed id to a uuid(uri)' do
             an_uri = "http://event/uri/"
             element.add_uri an_uri
-            element.id.text.should == Helpers::uuid(an_uri, 'EVENTID:')
+            element.id.text!.should == Helpers::uuid(an_uri, 'EVENTID:')
           end
         end
 
         describe '#id' do
           it 'should replace id with a regular event uuid when receiving regular text' do
             element.id "Some text"
-            element.id.text.should == Helpers::uuid("Some text", 'EVENTID:')
+            element.id.text!.should == Helpers::uuid("Some text", 'EVENTID:')
           end
         end
 
@@ -426,13 +426,13 @@ module ESS
           it 'should accept Time objects and return a string in ISO8601 format' do
             current_time = Time.now
             element.published current_time
-            element.published.text.should == current_time.iso8601
+            element.published.text!.should == current_time.iso8601
           end
 
           it 'should accept string in ISO8601 format and keep them the same' do
             current_time = Time.now.iso8601
             element.published current_time
-            element.published.text.should == current_time
+            element.published.text!.should == current_time
           end
         end
       end
@@ -441,8 +441,8 @@ module ESS
         let(:element) { Element.new :description, DTD::DESCRIPTION }
         it 'should strip unwanted tags from the description' do
           desc = "<p> About this feed...  </p> <script src=\"test.js\"></script>"
-          element.text desc
-          element.text.should == "<p> About this feed...  </p>"
+          element.text! desc
+          element.text!.should == "<p> About this feed...  </p>"
         end
       end
 
@@ -454,7 +454,7 @@ module ESS
             it 'should automatically set the channel id to a uuid(title)' do
               a_title = "A title"
               element.title a_title
-              element.id.text.should == Helpers::uuid(a_title, 'ESSID:')
+              element.id.text!.should == Helpers::uuid(a_title, 'ESSID:')
             end
           end
 
@@ -462,7 +462,7 @@ module ESS
             it 'should automatically set the channel id to a uuid(title)' do
               a_title = "A title"
               element.add_title a_title
-              element.id.text.should == Helpers::uuid(a_title, 'ESSID:')
+              element.id.text!.should == Helpers::uuid(a_title, 'ESSID:')
             end
           end
         end
@@ -475,7 +475,7 @@ module ESS
               element.id an_id
               a_title = "A title"
               element.title a_title
-              element.id.text.should == an_id
+              element.id.text!.should == an_id
             end
           end
 
@@ -484,7 +484,7 @@ module ESS
               element.id an_id
               a_title = "A title"
               element.add_title a_title
-              element.id.text.should == an_id
+              element.id.text!.should == an_id
             end
           end
         end
@@ -495,7 +495,7 @@ module ESS
       context 'an empty element which should not be empty' do
         let(:element) do
           element = Element.new :description, DTD::BASIC_ELEMENT
-          element.text "     "
+          element.text! "     "
           element
         end
 
@@ -504,7 +504,7 @@ module ESS
         end
 
         it 'should be valid if fixed' do
-          element.text "Sample text"
+          element.text! "Sample text"
           element.should be_valid
         end
       end
@@ -513,17 +513,17 @@ module ESS
         let(:element) { Element.new :logo, DTD::URL_ELEMENT }
 
         it 'should be invalid if a bad URL is set' do
-          element.text "bad url"
+          element.text! "bad url"
           element.should_not be_valid
         end
 
         it 'should be valid if valid URL is set' do
-          element.text "http://Example.com:8000/"
+          element.text! "http://Example.com:8000/"
           element.should be_valid
         end
 
         it 'should be valid if valid IP address is set' do
-          element.text "192.168.0.1"
+          element.text! "192.168.0.1"
           element.should be_valid
         end
       end
@@ -532,17 +532,17 @@ module ESS
         let(:element) { Element.new :latitude, DTD::LATITUDE }
 
         it 'should be invalid if not a floating point number' do
-          element.text "bad"
+          element.text! "bad"
           element.should_not be_valid
         end
 
         it 'should be invalid if above limits' do
-          element.text "1000.000"
+          element.text! "1000.000"
           element.should_not be_valid
         end
 
         it 'should be valid if within limit' do
-          element.text "70.31"
+          element.text! "70.31"
           element.should be_valid
         end
       end
@@ -551,17 +551,17 @@ module ESS
         let(:element) { Element.new :longitude, DTD::LONGITUDE }
 
         it 'should be invalid if not a floating point number' do
-          element.text "bad"
+          element.text! "bad"
           element.should_not be_valid
         end
 
         it 'should be invalid if above limits' do
-          element.text "1000.000"
+          element.text! "1000.000"
           element.should_not be_valid
         end
 
         it 'should be valid if within limit' do
-          element.text "90.31"
+          element.text! "90.31"
           element.should be_valid
         end
       end
@@ -570,17 +570,17 @@ module ESS
         let(:element) { Element.new :country_code, DTD::COUNTRY_CODE }
 
         it 'should be invalid if not a valid country code' do
-          element.text "bad"
+          element.text! "bad"
           element.should_not be_valid
         end
 
         it 'should be valid if valid country code' do
-          element.text "US"
+          element.text! "US"
           element.should be_valid
         end
 
         it 'should be valid if valid country code but lower case is used' do
-          element.text "us"
+          element.text! "us"
           element.should be_valid
         end
       end
@@ -589,17 +589,17 @@ module ESS
         let(:element) { Element.new :currency, DTD::CURRENCY }
 
         it 'should be invalid if not a valid currency' do
-          element.text "bad"
+          element.text! "bad"
           element.should_not be_valid
         end
 
         it 'should be valid if valid currency' do
-          element.text "USD"
+          element.text! "USD"
           element.should be_valid
         end
 
         it 'should be valid if valid currency but lower case is used' do
-          element.text "usd"
+          element.text! "usd"
           element.should be_valid
         end
       end
