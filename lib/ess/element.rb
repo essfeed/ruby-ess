@@ -83,8 +83,8 @@ module ESS
 
     def to_xml! xml=nil
       convert_to_string = true if xml.nil?
-      if xml.nil?
-        xml = Builder::XmlMarkup.new
+      xml = Builder::XmlMarkup.new if xml.nil?
+      if @name == :ess
         xml.instruct! :xml, :encoding => "UTF-8"
         xml.declare! :DOCTYPE, :ess, :PUBLIC, "-//ESS//DTD", "http://essfeed.org/history/0.9/index.dtd"
       end
