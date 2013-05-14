@@ -3,14 +3,19 @@ require 'uri'
 
 module ESS
   module Pusher
-    DEFAULT_OPTIONS = {
-      :aggregators => ["http://api.hypecal.com/v1/ess/validator.json"],
-      :feed => nil,
-      :data => nil
-    }
+    def self.aggregators= aggs
+      raise ArgumentError, "this method requires a list of links" if aggs.class != Array
+      @@aggregators = aggs
+    end
+
+    def self.aggregators
+      @@aggregators ||= ["http://api.hypecal.com/v1/ess/validator.json"]
+    end
 
     def self.push_to_aggregators options={}
-      options = DEFAULT_OPTIONS.merge options
+      options = { :aggregators => Pusher::aggregators,
+                  :feed => nil,
+                  :data => nil }.merge options
       responses = options[:aggregators].map do |aggregator|
         url = URI.parse(aggregator)
         request = Net::HTTP::Post.new(url.path)
@@ -22,6 +27,16 @@ module ESS
         response = Net::HTTP.start(url.host, url.port) { |http| http.request(request) }
       end
       return responses
+    end
+
+    def push_to_aggregators options={}
+      options = options.clone
+      puts @name
+      if @name != :ess
+        raise RuntimeError, "only ESS root element can be pushed to aggregators"
+      end
+      options[:data] = self.to_xml!
+      Pusher::push_to_aggregators options
     end
 
     def self.example_channel

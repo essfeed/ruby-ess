@@ -1,9 +1,11 @@
 require 'builder'
 require 'ess/helpers'
+require 'ess/pusher'
 
 module ESS
   class Element
     include ESS::Helpers
+    include ESS::Pusher
 
     attr_reader :dtd
 
