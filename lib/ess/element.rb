@@ -79,7 +79,7 @@ module ESS
       return true
     end
 
-    def to_xml xml=nil
+    def to_xml! xml=nil
       convert_to_string = true if xml.nil?
       if xml.nil?
         xml = Builder::XmlMarkup.new
@@ -94,13 +94,13 @@ module ESS
             p.text! @text
           end
         end
-        @child_tags.values.each { |tag_list| tag_list.each { |tag| tag.to_xml(p) } }
+        @child_tags.values.each { |tag_list| tag_list.each { |tag| tag.to_xml!(p) } }
       end
       xml.target! if convert_to_string
     end
 
     def to_s
-      to_xml
+      to_xml!
     end
 
     def method_missing m, *args, &block

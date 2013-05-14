@@ -195,17 +195,17 @@ module ESS
         end
       end
 
-      describe '#to_xml' do
+      describe '#to_xml!' do
         it 'should include the attribute value in xml' do
           element.xmlns_attr "Example value"
-          element.to_xml.should include('<ess xmlns="Example value"></ess>')
+          element.to_xml!.should include('<ess xmlns="Example value"></ess>')
         end
 
         it 'should include values for multiple attributes in xml' do
           element.xmlns_attr "xmlns value"
           element.version_attr "Version value"
-          element.to_xml.should include('xmlns="xmlns value"')
-          element.to_xml.should include('version="Version value"')
+          element.to_xml!.should include('xmlns="xmlns value"')
+          element.to_xml!.should include('version="Version value"')
         end
       end
     end
@@ -235,30 +235,30 @@ module ESS
       end
     end
 
-    describe '#to_xml' do
+    describe '#to_xml!' do
       let(:element) { Element.new(:channel, DTD::CHANNEL) }
 
       it 'should return a string' do
-        element.to_xml.class.should == String
+        element.to_xml!.class.should == String
       end
 
       context 'when the element is completely empty' do
         it 'should return at least the starting and ending tags' do
-          element.to_xml.should include("<channel></channel>")
+          element.to_xml!.should include("<channel></channel>")
         end
       end
 
       context 'when the element has text preset' do
         before(:each) { element.text! "Example text" }
         it 'should return the starting and ending tags with the text between them' do
-          element.to_xml.should include("<channel>Example text</channel>")
+          element.to_xml!.should include("<channel>Example text</channel>")
         end
       end
 
       context 'when the element has child elements' do
         before(:each) { element.generator "ruby" }
         it 'should return the starting and ending tags, and the same for the child tag' do
-          element.to_xml.should include("<channel><generator>ruby</generator></channel>")
+          element.to_xml!.should include("<channel><generator>ruby</generator></channel>")
         end
       end
     end
