@@ -4,7 +4,7 @@ require 'uri'
 module ESS
   module Pusher
     DEFAULT_OPTIONS = {
-      :aggregators => ["http://api.hypecal.com/v1/ess/validator.json"],
+      :aggregators => ["http://api.hypecal.com/v1/ess/aggregator.json"],
       :data => ""
     }
 
