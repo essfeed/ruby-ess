@@ -9,7 +9,7 @@ module ESS
     end
 
     def self.aggregators
-      @@aggregators ||= ["http://api.hypecal.com/v1/ess/validator.json"]
+      @@aggregators ||= ["http://api.hypecal.com/v1/ess/aggregator.json"]
     end
 
     def self.push_to_aggregators options={}
