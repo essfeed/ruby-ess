@@ -1,8 +1,10 @@
 require 'ess/postprocessing'
+require 'ess/validation'
 
 module ESS
   module DTD
     include ESS::Postprocessing
+    include ESS::Validation
 
     BASIC_ELEMENT = {
       :attributes => nil,
