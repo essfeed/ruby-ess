@@ -161,7 +161,7 @@ module ESS
         let(:element) { Element.new(:tags, DTD::TAGS) }
 
         it 'should return the list of possible child tags' do
-          element.available_tags == [:tag]
+          element.available_tags! == [:tag]
         end
       end
     end

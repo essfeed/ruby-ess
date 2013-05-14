@@ -34,7 +34,7 @@ module ESS
       end
     end
 
-    def available_tags
+    def available_tags!
       return [] if @dtd[:tags].nil?
       @dtd[:tags].keys
     end
@@ -104,14 +104,14 @@ module ESS
     end
 
     def method_missing m, *args, &block
-      if available_tags.include? m
+      if available_tags!.include? m
         return assign_tag(m, args, &block)
       elsif m.to_s.start_with? "add_"
         tag_name = m[4..-1].to_sym
-        return extend_tag_list(m, args, &block) if available_tags.include?(tag_name)
+        return extend_tag_list(m, args, &block) if available_tags!.include?(tag_name)
       elsif m.to_s.end_with? "_list"
         tag_name = m[0..-6].to_sym
-        return (@child_tags[tag_name] ||= []) if available_tags.include?(tag_name)
+        return (@child_tags[tag_name] ||= []) if available_tags!.include?(tag_name)
       elsif m.to_s.end_with? "_attr"
         attr_name = m[0..-6].to_sym
         return set_attribute(attr_name, args, &block) if available_attributes.include? attr_name
