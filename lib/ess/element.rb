@@ -93,6 +93,10 @@ module ESS
       xml.target! if convert_to_string
     end
 
+    def to_s
+      to_xml
+    end
+
     def method_missing m, *args, &block
       if available_tags.include? m
         return assign_tag(m, args, &block)

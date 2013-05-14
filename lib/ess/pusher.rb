@@ -5,7 +5,8 @@ module ESS
   module Pusher
     DEFAULT_OPTIONS = {
       :aggregators => ["http://api.hypecal.com/v1/ess/validator.json"],
-      :data => ""
+      :feed => nil,
+      :data => nil
     }
 
     def self.push_to_aggregators options={}
@@ -13,8 +14,11 @@ module ESS
       responses = options[:aggregators].map do |aggregator|
         url = URI.parse(aggregator)
         request = Net::HTTP::Post.new(url.path)
-        request.form_data = { "feed_file" => options[:data], "output" => "json" }
-        request.content_type = 'text/xml'
+        if options[:feed].nil?
+          request.form_data = { "feed_file" => options[:data], "output" => "json" }
+        else
+          request.form_data = { "feed" => options[:feed], "output" => "json" }
+        end
         response = Net::HTTP.start(url.host, url.port) { |http| http.request(request) }
       end
       return responses
