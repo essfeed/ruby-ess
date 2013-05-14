@@ -87,7 +87,13 @@ module ESS
         xml.declare! :DOCTYPE, :ess, :PUBLIC, "-//ESS//DTD", "http://essfeed.org/history/0.9/index.dtd"
       end
       xml.tag! @name, @attributes do |p|
-        p.text! @text if !@text.nil?
+        if !@text.nil?
+          if @dtd[:cdata]
+            p.cdata! @text
+          else
+            p.text! @text
+          end
+        end
         @child_tags.values.each { |tag_list| tag_list.each { |tag| tag.to_xml(p) } }
       end
       xml.target! if convert_to_string

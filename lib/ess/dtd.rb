@@ -13,7 +13,8 @@ module ESS
     DESCRIPTION = {
       :attributes => nil,
       :tags => nil,
-      :postprocessing_text => [ StripSpecificHTMLTags.new ]
+      :postprocessing_text => [ StripSpecificHTMLTags.new ],
+      :cdata => true
     }
 
     BASIC_TIME = {
