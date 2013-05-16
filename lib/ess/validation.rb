@@ -4,6 +4,9 @@ require 'time'
 module ESS
   module Validation
 
+    class ValidationError < StandardError
+    end
+
     class TextIsNotNull
       def validate tag
         if tag.text!.strip == ''

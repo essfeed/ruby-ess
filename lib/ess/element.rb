@@ -49,34 +49,36 @@ module ESS
       "#<#{self.class}:#{object_id} text=\"#{@text}\">"
     end
 
-    def valid?
+    def validate
       if @dtd.include? :validation
-        begin
-          @dtd[:validation].each { |validator| validator.validate self }
-        rescue
-          return false
-        end
+        @dtd[:validation].each { |validator| validator.validate self }
       end
       if !@dtd[:tags].nil?
         @dtd[:tags].each_pair do |tag_name, tag_desc|
           if tag_desc[:mandatory] && 
                 (!@child_tags.include?(tag_name) || @child_tags[tag_name].length == 0)
-            return false
+            raise Validation::ValidationError, "< #{tag_name} > is a mandatory tag in < #{@name} >"
           end
           if tag_desc[:max_occurs] != :inf &&
                 (@child_tags.include?(tag_name) && @child_tags[tag_name].length != 0)
             if tag_desc[:max_occurs].to_i < @child_tags[tag_name].length
-              return false
+              raise Validation::ValidationError, "< #{tag_name} > can occur maximally #{tag_desc[:max_occurs].to_i} times in < #{@name} >"
             end
           end
-          child_tags_valid = @child_tags.values.map do |a_tags_list|
-            tags_in_list_valid = a_tags_list.map do |one_tag|
-              one_tag.valid?
+          @child_tags.values.map do |a_tags_list|
+            a_tags_list.map do |one_tag|
+              one_tag.validate
             end
-            tags_in_list_valid.all?
           end
-          return false if !child_tags_valid.all?
         end
+      end
+    end
+
+    def valid?
+      begin
+        validate
+      rescue
+        return false
       end
       return true
     end

@@ -13,7 +13,7 @@ module ESS
       ess.version_attr options[:version]
       ess.lang_attr options[:lang]
       block.call(ess) if block
-      raise RuntimeError, "The resulting ESS channel is not valid" unless !options[:validate] || ess.valid?
+      ess.validate if options[:validate]
       return ess
     end
   end
