@@ -126,13 +126,13 @@ module ESS
                        :interval => { :mandatory => false,
                                       :max_occurs => 1 },
                        :selected_day => { :mandatory => false,
-                                          :max_occurs => 1,
+                                          :max_occurs => :inf,
                                           :valid_values => [
                                             'number','monday','tuesday',
                                             'wednesday','thursday','friday',
                                             'saturday','sunday'] },
                        :selected_week => { :mandatory => false,
-                                           :max_occurs => 1,
+                                           :max_occurs => :inf,
                                            :valid_values => [
                                              'first','second','third',
                                              'fourth','last' ] } },
@@ -222,7 +222,7 @@ module ESS
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'standalone','recurrent'] },
-                       :mode => { :mandatory => false,
+                       :mode => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_values => [
                                     'fixed','free','invitation',
@@ -236,13 +236,13 @@ module ESS
                        :interval => { :mandatory => false,
                                       :max_occurs => 1 },
                        :selected_day => { :mandatory => false,
-                                          :max_occurs => 1,
+                                          :max_occurs => :inf,
                                           :valid_values => [
                                             'number','monday','tuesday',
                                             'wednesday','thursday','friday',
                                             'saturday','sunday'] },
                        :selected_week => { :mandatory => false,
-                                           :max_occurs => 1,
+                                           :max_occurs => :inf,
                                            :valid_values => [
                                              'first','second','third',
                                              'fourth','last'] },
@@ -307,7 +307,7 @@ module ESS
                                   :valid_values => [
                                     'organizer','performer','attendee',
                                     'social','author','contributor'] },
-                       :priority => { :mandatory => true,
+                       :priority => { :mandatory => false,
                                       :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,

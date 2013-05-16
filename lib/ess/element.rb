@@ -53,6 +53,24 @@ module ESS
       if @dtd.include? :validation
         @dtd[:validation].each { |validator| validator.validate self }
       end
+      if !@dtd[:attributes].nil?
+        @dtd[:attributes].each_pair do |attr_name, attr_desc|
+          if attr_desc[:mandatory]
+            if @attributes[attr_name].nil? ||  @attributes[attr_name] == ""
+              raise Validation::ValidationError, "missing mandatory attribute #{attr_name} from <#{@name}> element"
+            end
+          end
+          max_occurs = attr_desc[:max_occurs]
+          unless max_occurs.nil?
+            unless max_occurs == :inf
+              max_occurs = max_occurs.to_i
+              unless @attributes[attr_name].nil? || @attributes[attr_name].split(",").length <= max_occurs
+                raise Validation::ValidationError, "too many values for attribute #{attr_name}: #{@attributes[attr_name]}"
+              end
+            end
+          end
+        end
+      end
       if !@dtd[:tags].nil?
         @dtd[:tags].each_pair do |tag_name, tag_desc|
           if tag_desc[:mandatory] && 
@@ -65,13 +83,14 @@ module ESS
               raise Validation::ValidationError, "< #{tag_name} > can occur maximally #{tag_desc[:max_occurs].to_i} times in < #{@name} >"
             end
           end
-          @child_tags.values.map do |a_tags_list|
-            a_tags_list.map do |one_tag|
+          @child_tags.values.each do |a_tags_list|
+            a_tags_list.each do |one_tag|
               one_tag.validate
             end
           end
         end
       end
+      return nil
     end
 
     def valid?

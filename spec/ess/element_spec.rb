@@ -310,7 +310,11 @@ module ESS
       end
 
       context 'called on an element with mandatory tags and counter restricted' do
-        let(:element) { Element.new :tags, DTD::RELATION_ITEM }
+        let(:element) do
+          element = Element.new :tags, DTD::RELATION_ITEM
+          element.type_attr "related"
+          element
+        end
 
         it 'should return true if all tags presents and within limits' do
           element.name "Example name"
@@ -336,15 +340,15 @@ module ESS
           element.description "desc"
           element.published Time.now.to_s
           element.uri "http://example.com/"
-          element.categories.add_item do |item|
+          element.categories.add_item :type => "award" do |item|
             item.name "A name"
             item.id "An ID"
           end
-          element.dates.add_item do |item|
+          element.dates.add_item :type => "standalone" do |item|
             item.name "A name"
             item.start Time.now.to_s
           end
-          element.places.add_item do |item|
+          element.places.add_item :type => "fixed" do |item|
             item.name "A name"
           end
           element
@@ -645,8 +649,13 @@ module ESS
       end
 
       context 'a price item with a value tag, but without a currency tag' do
-        let(:element) { Element.new :item, DTD::PRICE_ITEM }
-        before(:each) { element.name "Example name" }
+        let(:element) do
+          element = Element.new :item, DTD::PRICE_ITEM
+          element.type_attr "standalone"
+          element.mode_attr "fixed"
+          element.name "Example name"
+          element
+        end
 
         context 'when value is 0' do
           before(:each) { element.value 0 }
@@ -665,6 +674,57 @@ module ESS
             lambda {
               element.validate
             }.should raise_error
+          end
+        end
+      end
+
+      context 'attributes' do
+        describe 'an element with a mandatory attribute' do
+          let(:element) do
+            element = Element.new :item, DTD::PRICE_ITEM
+            element.name "Example name"
+            element.value 0
+            element
+          end
+
+          context 'when the mandatory attribute is missing' do
+            it 'should be invalid' do
+              element.should_not be_valid
+            end
+          end
+
+          context 'when the mandatory attribute is set' do
+            it 'should be valid' do
+              element.type_attr "standalone"
+              element.mode_attr "fixed"
+              element.should be_valid
+            end
+          end
+        end
+
+        describe 'an element with an attribute with one value limit' do
+          let(:element) do
+            element = Element.new :item, DTD::PRICE_ITEM
+            element.mode_attr "fixed"
+            element.name "Example name"
+            element.value 0
+            element
+          end
+
+          context 'when single value is set' do
+            before(:each) { element.type_attr "standalone" }
+
+            it 'should be valid' do
+              element.should be_valid
+            end
+          end
+
+          context 'when a multiple value is set' do
+            before(:each) { element.type_attr "standalone,recurrent" }
+
+            it 'should not be valid' do
+              element.should_not be_valid
+            end
           end
         end
       end
