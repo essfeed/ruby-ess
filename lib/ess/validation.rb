@@ -564,6 +564,17 @@ module ESS
         end
       end
     end
+
+    class CurrMandatoryIfValueGT0
+      def validate price_tag
+        if price_tag.value.text!.to_i != 0
+          if price_tag.currency.text! == ""
+            raise InvalidValueError, "the <currency> element of a price item cannot be empty if <value> is not 0"
+          end
+        end
+      end
+    end
+
   end
 end
 

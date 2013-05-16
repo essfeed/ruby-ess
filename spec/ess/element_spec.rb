@@ -643,6 +643,31 @@ module ESS
           element.should be_valid
         end
       end
+
+      context 'a price item with a value tag, but without a currency tag' do
+        let(:element) { Element.new :item, DTD::PRICE_ITEM }
+        before(:each) { element.name "Example name" }
+
+        context 'when value is 0' do
+          before(:each) { element.value 0 }
+
+          it 'should not raise error' do
+            lambda {
+              element.validate
+            }.should_not raise_error
+          end
+        end
+
+        context 'when value is not 0' do
+          before(:each) { element.value 5 }
+
+          it 'should raise an error' do
+            lambda {
+              element.validate
+            }.should raise_error
+          end
+        end
+      end
     end
   end
 end
