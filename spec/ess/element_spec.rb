@@ -383,42 +383,82 @@ module ESS
       describe 'Feed element' do
         let(:element) { Element.new(:feed, DTD::FEED) }
 
-        describe '#title' do
-          it 'should automatically set the feed id to a uuid(title)' do
-            a_title = "A title"
-            element.title a_title
-            element.id.text!.should == Helpers::uuid(a_title, 'EVENTID:')
-          end
-        end
-
-        describe '#add_title' do
-          it 'should automatically set the feed id to a uuid(title)' do
-            a_title = "A title"
-            element.add_title a_title
-            element.id.text!.should == Helpers::uuid(a_title, 'EVENTID:')
-          end
-        end
-
-        describe '#uri' do
-          it 'should automatically set the feed id to a uuid(uri)' do
-            an_uri = "http://event/uri/"
-            element.uri an_uri
-            element.id.text!.should == Helpers::uuid(an_uri, 'EVENTID:')
-          end
-        end
-
-        describe '#add_uri' do
-          it 'should automatically set the feed id to a uuid(uri)' do
-            an_uri = "http://event/uri/"
-            element.add_uri an_uri
-            element.id.text!.should == Helpers::uuid(an_uri, 'EVENTID:')
-          end
-        end
-
         describe '#id' do
           it 'should replace id with a regular event uuid when receiving regular text' do
             element.id "Some text"
             element.id.text!.should == Helpers::uuid("Some text", 'EVENTID:')
+          end
+        end
+
+        context 'when no id set' do
+          describe '#title' do
+            it 'should automatically set the feed id to a uuid(title)' do
+              a_title = "A title"
+              puts element.id.text!
+              element.title a_title
+              element.id.text!.should == Helpers::uuid(a_title, 'EVENTID:')
+            end
+          end
+
+          describe '#add_title' do
+            it 'should automatically set the feed id to a uuid(title)' do
+              a_title = "A title"
+              element.add_title a_title
+              element.id.text!.should == Helpers::uuid(a_title, 'EVENTID:')
+            end
+          end
+
+          describe '#uri' do
+            it 'should automatically set the feed id to a uuid(uri)' do
+              an_uri = "http://event/uri/"
+              element.uri an_uri
+              element.id.text!.should == Helpers::uuid(an_uri, 'EVENTID:')
+            end
+          end
+
+          describe '#add_uri' do
+            it 'should automatically set the feed id to a uuid(uri)' do
+              an_uri = "http://event/uri/"
+              element.add_uri an_uri
+              element.id.text!.should == Helpers::uuid(an_uri, 'EVENTID:')
+            end
+          end
+        end
+
+        context 'when id was set' do
+          let(:an_id) { Helpers::uuid("Some text", 'EVENTID:') }
+          before(:each) { element.id an_id }
+
+          describe '#title' do
+            it 'should not automatically set the feed id to a uuid(title)' do
+              a_title = "A title"
+              element.title a_title
+              element.id.text!.should == an_id
+            end
+          end
+
+          describe '#add_title' do
+            it 'should not automatically set the feed id to a uuid(title)' do
+              a_title = "A title"
+              element.add_title a_title
+              element.id.text!.should == an_id
+            end
+          end
+
+          describe '#uri' do
+            it 'should not automatically set the feed id to a uuid(uri)' do
+              an_uri = "http://event/uri/"
+              element.uri an_uri
+              element.id.text!.should == an_id
+            end
+          end
+
+          describe '#add_uri' do
+            it 'should not automatically set the feed id to a uuid(uri)' do
+              an_uri = "http://event/uri/"
+              element.add_uri an_uri
+              element.id.text!.should == an_id
+            end
           end
         end
 

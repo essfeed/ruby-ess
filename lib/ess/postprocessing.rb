@@ -5,19 +5,19 @@ module ESS
   module Postprocessing
     class FeedTitle
       def process feed_tag, title_tag
-        feed_tag.id(title_tag.text!)
+        feed_tag.id(title_tag.text!) if feed_tag.id.text! == ""
       end
     end
 
     class FeedURI
       def process feed_tag, uri_tag
-        feed_tag.id(uri_tag.text!)
+        feed_tag.id(uri_tag.text!) if feed_tag.id.text! == ""
       end
     end
 
     class FeedID
       def process feed_tag, id_tag
-        unless id_tag.text!.start_with?('EVENTID:')
+        unless id_tag.text!.start_with?('EVENTID:') || id_tag.text! == ""
           id_tag.text!(Helpers::uuid(id_tag.text!, 'EVENTID:'))
         end
       end
@@ -39,7 +39,7 @@ module ESS
 
     class ChannelLink
       def process channel_tag, link_tag
-        channel_tag.id(link_tag.text!)
+        channel_tag.id(link_tag.text!) if channel_tag.id.text! == ""
       end
     end
 
