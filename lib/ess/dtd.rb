@@ -90,7 +90,7 @@ module ESS
                                           'networking',
                                           'party',
                                           'seminar',
-                                          'themeparty'] },
+                                          'general'] },
                        :priority => { :mandatory => false,
                                       :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
