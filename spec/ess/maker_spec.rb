@@ -1,3 +1,5 @@
+require 'spec_helper'
+
 module ESS
   describe Maker do
     describe '.make' do
