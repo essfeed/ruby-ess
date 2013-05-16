@@ -1,7 +1,7 @@
 module ESS
   module Examples
 
-    def from_essfeeds_org_home
+    def self.from_essfeeds_org_home
       ess = Maker.make do |ess|
         ess.channel do |channel|
           channel.title "National Stadium Football events"
@@ -181,6 +181,245 @@ module ESS
                 item.name "nearby event"
                 item.id "EVENTID:50b12:3451d4:34f5a71:1cf6a:2ff81"
                 item.uri "http://sample.com/feed/event_5.ess"
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def self.paying_attendees
+      ess = Maker.make do |ess|
+        ess.channel do |channel|
+          channel.title "Studio 54 Events Feed"
+          channel.id "ESSID:65ca2c92-2c98-068e-390d-543c376f8e7d"
+          channel.link "http://example.com/feed/sample.ess"
+          channel.published "2013-06-10T10:55:14Z"
+
+          channel.add_feed do |feed|
+            feed.title "Studio 54 Documentary Night Private Event"
+            feed.id "EVENTID:4e0ea291-0acc-b222-60bb-dda020ca8664"
+            feed.uri "http://studio54.com/events/saturday.html"
+            feed.published "2013-04-23T00:25:33+02:00"
+            feed.access "PRIVATE"
+            feed.description "Get payed to assist to a documentary about the Studio 54"
+
+            feed.categories.add_item :type => "party" do |item|
+              item.name "nightclub"
+            end
+
+            feed.dates.add_item :type => "standalone" do |item|
+              item.name "Only this night"
+              item.start "2013-10-25T15:30:00Z"
+              item.duration "7200"
+            end
+
+            feed.places.add_item :type => "fixed" do |item|
+              item.name "Studio 54"
+              item.address "254 W 54th St"
+              item.city "New York"
+              item.country_code "US"
+            end
+
+            feed.prices.add_item :type => "standalone", :mode => "renumerated" do |item|
+              item.name "Get Paied to Assist to This Documenary"
+              item.value 90
+              item.currency "USD"
+            end
+          end
+        end
+      end
+    end
+
+    def self.osteopathy_course
+      ess = Maker.make do |ess|
+        ess.channel do |channel|
+          channel.title "London College of Osteopathy Feeds"
+          channel.id "ESSID:65ca2c92-2c98-068e-390d-543c376f8e7d"
+          channel.link "http://example.com/feed/sample.ess"
+          channel.published "2013-06-10T10:55:14Z"
+
+          channel.add_feed do |feed|
+            feed.title "A Twice a Month Intensive Course"
+            feed.id "EVENTID:4e0ea291-0acc-b222-60bb-dda020ca8664"
+            feed.uri "http://londoncollege.com/events/page.html"
+            feed.published "2013-04-23T00:25:33+02:00"
+            feed.access "PUBLIC"
+            feed.description "Intensive classes  of six  hours each filled with anatomy,\n" +
+                             "gerontology, history of osteopathy and physiology"
+
+            feed.categories.add_item :type => "course" do |item|
+              item.name "University Course"
+            end
+
+            feed.tags do |tags|
+              tags.add_tag "Osteopathy"
+              tags.add_tag "Physiology"
+              tags.add_tag "Anatomy"
+              tags.add_tag "Gerontology"
+            end
+
+            feed.dates.add_item :type => "recurrent", :unit => "month", :limit => 6, :selected_day => "saturday", :selected_week => "first,last" do |item|
+              item.name "Course the first and last Saturdays of every month"
+              item.start "2013-10-25T15:30:00Z"
+              item.duration "21600"
+            end
+
+            feed.places.add_item :type => "fixed" do |item|
+              item.name "London College of Osteopathy"
+              item.address "380 Wellington St. Tower B, 6th Floor"
+              item.city "London"
+              item.country_code "GB"
+            end
+          end
+        end
+      end
+    end
+
+    def self.belfast_festival
+      ess = Maker.make do |ess|
+        ess.channel do |channel|
+          channel.title "Belfast Film Festival Events"
+          channel.id "ESSID:65ca2c92-2c98-068e-390d-543c376f8e7d"
+          channel.link "http://belfastfilmfestival.org/feed/films.ess"
+          channel.published "2013-06-10T10:55:14Z"
+
+          channel.add_feed do |feed|
+            feed.title "First Horror Movie"
+            feed.id "EVENTID:4e0ea291-0acc-b222-60bb-dda020ca8664"
+            feed.uri "http://belfastfilmfestival.org/events/4567FSE/page.html"
+            feed.published "2013-04-23T00:25:33+02:00"
+            feed.access "PUBLIC"
+            feed.description "Description of the first horror movie."
+
+            feed.categories.add_item :type => "festival" do |item|
+              item.name "Horror Movie"
+              item.id "I10"
+            end
+
+            feed.tags do |tags|
+              tags.add_tag "Horror"
+              tags.add_tag "Movie"
+              tags.add_tag "Belfast"
+              tags.add_tag "Festival"
+            end
+
+            feed.dates.add_item :type => "standalone" do |item|
+              item.name "First Representation Date"
+              item.start "2013-10-25T15:30:00Z"
+              item.duration "7200"
+            end
+
+            feed.places.add_item :type => "fixed" do |item|
+              item.name "Congress Hall"
+              item.address "49 Donegall Place"
+              item.city "Belfast"
+              item.country_code "GB"
+            end
+
+            feed.prices.add_item :type => "standalone", :mode => "fixed" do |item|
+              item.name "One Uniq Price"
+              item.value 10
+              item.currency "GBP"
+            end
+          end
+
+          channel.add_feed do |feed|
+            feed.title "Second Fantastic Movie"
+            feed.id "EVENTID:4e0ea291-0acc-b222-60bb-dda020ca8664"
+            feed.uri "http://belfastfilmfestival.org/events/45098FSE/page.html"
+            feed.published "2013-04-23T00:25:33+02:00"
+            feed.access "PUBLIC"
+            feed.description "Description of the second fantastic movie."
+
+            feed.categories.add_item :type => "festival" do |item|
+              item.name "Mistery Movie"
+              item.id "I12"
+            end
+
+            feed.tags do |tags|
+              tags.add_tag "Fantastic"
+              tags.add_tag "Mistery"
+              tags.add_tag "Suspense"
+              tags.add_tag "Movie"
+              tags.add_tag "Belfast"
+              tags.add_tag "Festival"
+            end
+
+            feed.dates.add_item :type => "standalone" do |item|
+              item.name "Second Representation Date"
+              item.start "2013-12-25T15:30:00Z"
+              item.duration 7200
+            end
+
+            feed.places.add_item :type => "fixed" do |item|
+              item.name "Hotel Hilton"
+              item.address "4 Lanyon Place"
+              item.city "Belfast"
+              item.country_code "GB"
+            end
+
+            feed.prices do |prices|
+              prices.add_item :type => "standalone", :mode => "fixed" do |item|
+                item.name "Reservation VIP"
+                item.value 100
+                item.currency "GBP"
+              end
+
+              prices.add_item :type => "standalone", :mode => "fixed" do |item|
+                item.name "General Price"
+                item.value 20
+                item.currency "GBP"
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def self.ring_cycle
+      ess = Maker.make do |ess|
+        ess.channel do |channel|
+          channel.title "Series of Ring Cycle Operas events"
+          channel.id "ESSID:65ca2c92-2c98-068e-390d-543c376f8e7d"
+          channel.link "http://example.com/feed/sample.ess"
+          channel.published "2013-06-10T10:55:14Z"
+
+          channel.add_feed do |feed|
+            feed.title "Recursive Event Cycle"
+            feed.id "EVENTID:4e0ea291-0acc-b222-60bb-dda020ca8664"
+            feed.uri "http://opera.com/events/page.html"
+            feed.published "2013-04-23T00:25:33+02:00"
+            feed.access "PUBLIC"
+            feed.description "Description of the Ring Cycle"
+
+            feed.categories.add_item :type => "entertainment" do |item|
+              item.name "Opera"
+              item.id "P1"
+            end
+
+            feed.dates.add_item :type => "recurrent", :unit => "month", :limit => 12, :selected_day => "monday,tuesday,thursday,friday", :selected_week => "last" do |item|
+              item.name "6H Opera every last week of every month (monday,tuesday,thursday and friday) for one year"
+              item.start "2013-01-25T08:30:00Z"
+              item.duration 21600
+            end
+
+            feed.places.add_item :type => "fixed" do |item|
+              item.name "London College of Osteopathy"
+              item.address "380 Wellington St. Tower B, 6th Floor"
+              item.city "London"
+              item.country_code "GB"
+            end
+
+            feed.media do |media|
+              media.add_item :type => "image" do |item|
+                item.name "Image 01"
+                item.uri "http://opera.com/ringcycle/image01.png"
+              end
+
+              media.add_item :type => "image" do |item|
+                item.name "Image 02"
+                item.uri "http://opera.com/ringcycle/image02.png"
               end
             end
           end
