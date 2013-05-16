@@ -1,3 +1,5 @@
+require 'rubygems'
+require 'json'
 require 'net/http'
 require 'uri'
 
@@ -16,8 +18,9 @@ module ESS
       options = { :aggregators => Pusher::aggregators,
                   :feed => nil,
                   :data => nil,
-                  :request => nil }.merge options
-      responses = options[:aggregators].map do |aggregator|
+                  :request => nil,
+                  :ignore_errors => false }.merge options
+      options[:aggregators].each do |aggregator|
         url = URI.parse(aggregator)
         request = Net::HTTP::Post.new(url.path)
 
@@ -47,8 +50,14 @@ module ESS
         end
         request.form_data = form_data
         response = Net::HTTP.start(url.host, url.port) { |http| http.request(request) }
+        response = JSON.parse response.body
+        unless options[:ignore_errors]
+          errors = response["result"]["error"]
+          unless errors.nil?
+            raise RuntimeError, "errors while submitting feed: #{errors}"
+          end
+        end
       end
-      return responses
     end
 
     def push_to_aggregators options={}
