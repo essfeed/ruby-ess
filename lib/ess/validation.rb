@@ -21,11 +21,11 @@ module ESS
       end
     end
 
-    class TextIsValidURL
-      def validate tag
-        unless tag.text! =~ /^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i || tag.text!.length > 10
-          unless isValidIP tag.text!
-            raise InvalidValueError, "invalid URL: #{tag.text!}"
+    class URLValidation
+      def validate_url text
+        unless text =~ /^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i || text.length > 10
+          unless isValidIP text
+            raise InvalidValueError, "invalid URL: #{text}"
           end
         end
       end
@@ -37,6 +37,18 @@ module ESS
           end
           return text.split('.').map { |part| part.to_i <= 255 }.all?
         end
+    end
+
+    class TextIsValidURL < URLValidation
+      def validate tag
+        validate_url tag.text!
+      end
+    end
+
+    class XmlnsIsValidURL < URLValidation
+      def validate ess_tag
+        validate_url ess_tag.xmlns_attr
+      end
     end
 
     class TextIsValidLatitude

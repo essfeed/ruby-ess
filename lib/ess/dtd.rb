@@ -508,7 +508,8 @@ module ESS
       :tags => { :channel => { :dtd => CHANNEL,
                                :mandatory => true,
                                :max_occurs => 1 } },
-      :validation => [ LangIsValid.new ]
+      :validation => [ LangIsValid.new,
+                       XmlnsIsValidURL.new ]
     }
 
     class InvalidValueError < RuntimeError
