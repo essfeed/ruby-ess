@@ -727,6 +727,24 @@ module ESS
             end
           end
         end
+
+        describe 'lang attribute in ESS tag' do
+          let(:element) { Examples.ring_cycle }
+
+          context 'when attribute has a valid value' do
+            it 'should be valid' do
+              element.lang_attr "zu"
+              element.should be_valid
+            end
+          end
+
+          context 'when attribute has an invalid value' do
+            it 'should not be valid' do
+              element.lang_attr "bad"
+              element.should_not be_valid
+            end
+          end
+        end
       end
     end
   end

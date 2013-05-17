@@ -503,8 +503,8 @@ module ESS
                                      :max_occurs => 1} },
       :tags => { :channel => { :dtd => CHANNEL,
                                :mandatory => true,
-                               :max_occurs => 1 }
-      }
+                               :max_occurs => 1 } },
+      :validation => [ LangIsValid.new ]
     }
 
     class InvalidValueError < RuntimeError
