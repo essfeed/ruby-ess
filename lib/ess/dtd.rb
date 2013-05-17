@@ -135,7 +135,9 @@ module ESS
                                            :max_occurs => :inf,
                                            :valid_values => [
                                              'first','second','third',
-                                             'fourth','last' ] } },
+                                             'fourth','last' ] },
+                       :priority => { :mandatory => false,
+                                      :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
@@ -387,7 +389,9 @@ module ESS
       :attributes => { :type => { :mandatory => true,
                                   :max_occurs => 1,
                                   :valid_vlaues => [
-                                    'alternative','related','enclosure'] } },
+                                    'alternative','related','enclosure'] },
+                       :priority => { :mandatory => false,
+                                      :max_occurs => 1 } },
       :tags => { :name => { :dtd => BASIC_ELEMENT,
                             :mandatory => true,
                             :max_occurs => 1 },
