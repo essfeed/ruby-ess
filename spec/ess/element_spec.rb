@@ -746,6 +746,30 @@ module ESS
           end
         end
       end
+
+      context "a date item" do
+        let(:element) do
+          element = Element.new(:item, DTD::DATE_ITEM)
+          element.name "An example date"
+          element.start Time.now
+          element
+        end
+
+        context 'type is recurrent' do
+          before(:each) { element.type_attr "recurrent" }
+          context 'unit type is defined' do
+            it 'should be valid' do
+              element.unit_attr "month"
+              element.should be_valid
+            end
+          end
+          context 'unit type is not defined' do
+            it 'should not be valid' do
+              element.should_not be_valid
+            end
+          end
+        end
+      end
     end
   end
 end

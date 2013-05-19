@@ -146,8 +146,8 @@ module ESS
                              :max_occurs => 1 },
                  :duration => { :dtd => BASIC_ELEMENT,
                                 :mandatory => false,
-                                :max_occurs => 1 }
-      }
+                                :max_occurs => 1 } },
+      :validation => [ UnitMandatoryIfRecurrent.new ]
     }
 
     DATES = {
