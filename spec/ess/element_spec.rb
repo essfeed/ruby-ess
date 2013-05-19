@@ -769,6 +769,14 @@ module ESS
             end
           end
         end
+
+        context 'type is standalone' do
+          before(:each) { element.type_attr "standalone" }
+
+          it 'should be valid without unit attr' do
+            element.should be_valid
+          end
+        end
       end
     end
   end
