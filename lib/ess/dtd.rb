@@ -7,62 +7,43 @@ module ESS
     include ESS::Validation
 
     BASIC_ELEMENT = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsNotNull.new ]
     }
 
     DESCRIPTION = {
-      :attributes => nil,
-      :tags => nil,
       :postprocessing_text => [ StripSpecificHTMLTags.new ],
       :cdata => true
     }
 
     BASIC_TIME = {
-      :attributes => nil,
-      :tags => nil,
       :postprocessing_text => [ ProcessTime.new ]
     }
 
     EMAIL = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsValidEmail.new ]
     }
 
     URL_ELEMENT = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsValidURL.new ]
     }
 
     LATITUDE = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsValidLatitude.new ]
     }
 
     LONGITUDE = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsValidLongitude.new ]
     }
 
     COUNTRY_CODE = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsValidCountryCode.new ]
     }
 
     CURRENCY = {
-      :attributes => nil,
-      :tags => nil,
       :validation => [ TextIsValidCurrency.new ]
     }
 
     TAGS = {
-      :attributes => nil,
       :tags => { :tag => { :dtd => BASIC_ELEMENT,
                            :mandatory => true,
                            :max_occurs => :inf }
@@ -103,7 +84,6 @@ module ESS
     }
 
     CATEGORIES = {
-      :attributes => nil,
       :tags => { :item => { :dtd => CATEGORY_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -151,7 +131,6 @@ module ESS
     }
 
     DATES = {
-      :attributes => nil,
       :tags => { :item => { :dtd => DATE_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -212,7 +191,6 @@ module ESS
     }
 
     PLACES = {
-      :attributes => nil,
       :tags => { :item => { :dtd => PLACE_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -273,7 +251,6 @@ module ESS
     }
 
     PRICES = {
-      :attributes => nil,
       :tags => { :item => { :dtd => PRICE_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -297,7 +274,6 @@ module ESS
     }
 
     MEDIA = {
-      :attributes => nil,
       :tags => { :item => { :dtd => MEDIA_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -379,7 +355,6 @@ module ESS
     }
 
     PEOPLE = {
-      :attributes => nil,
       :tags => { :item => { :dtd => PEOPLE_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -406,7 +381,6 @@ module ESS
     }
 
     RELATIONS = {
-      :attributes => nil,
       :tags => { :item => { :dtd => RELATION_ITEM,
                             :mandatory => true,
                             :max_occurs => :inf }
@@ -414,7 +388,6 @@ module ESS
     }
 
     FEED = {
-      :attributes => nil,
       :tags =>  { :title => { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
                               :max_occurs => 1,
@@ -468,7 +441,6 @@ module ESS
     }
 
     CHANNEL = {
-      :attributes => nil,
       :tags =>  { :title => { :dtd => BASIC_ELEMENT,
                               :mandatory => true,
                               :max_occurs => 1,

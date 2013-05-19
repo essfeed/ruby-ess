@@ -11,12 +11,6 @@ module ESS
         expect { Element.new :tag_name }.to raise_error
       end
 
-      it 'should require that the DTD argument have "attributes" and "tags" keys' do
-        expect { Element.new(:tag_name, {}) }.to raise_error
-        expect { Element.new(:tag_name, {:attributes => ""}) }.to raise_error
-        expect { Element.new(:tag_name, {:tags => ""}) }.to raise_error
-      end
-
       it 'should accept a hash with both :attributes and :tags keys' do
         lambda {
           Element.new(:tag_name, {:attributes => "", :tags => ""})
@@ -156,27 +150,10 @@ module ESS
           end
         end
       end
-
-      describe '#available_tags' do
-        let(:element) { Element.new(:tags, DTD::TAGS) }
-
-        it 'should return the list of possible child tags' do
-          element.available_tags! == [:tag]
-        end
-      end
     end
 
     context 'with attributes, ESS tag for example' do
       let(:element) { Element.new(:ess, DTD::ESS) }
-
-      describe '#available_attributes' do
-        it 'should return the list of attributes valid for that element' do
-          attr_list = element.available_attributes!
-          attr_list.should include(:xmlns)
-          attr_list.should include(:version)
-          attr_list.should include(:lang)
-        end
-      end
 
       describe '#xmlns_attr' do
         it 'should return an empty string if it was not yet set' do
