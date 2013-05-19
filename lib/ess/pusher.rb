@@ -36,9 +36,8 @@ module ESS
         end
         form_data["HTTP_HOST"] = ENV["HTTP_HOST"] if ENV["HTTP_HOST"]
         if options[:request]
-          request = options[:request]
-          form_data["REMOTE_ADDR"] = request.remote_ip
-          form_data["REQUEST_URI"] = request.fullpath
+          form_data["REMOTE_ADDR"] = options[:request].remote_ip
+          form_data["REQUEST_URI"] = options[:request].fullpath
         end
         form_data["GEOIP_LATITUDE"] = ENV["GEOIP_LATITUDE"] if ENV["GEOIP_LATITUDE"]
         form_data["GEOIP_LONGITUDE"] = ENV["GEOIP_LONGITUDE"] if ENV["GEOIP_LONGITUDE"]
@@ -58,15 +57,6 @@ module ESS
           end
         end
       end
-    end
-
-    def push_to_aggregators options={}
-      options = options.clone
-      if @name != :ess
-        raise RuntimeError, "only ESS root element can be pushed to aggregators"
-      end
-      options[:data] = self.to_xml!
-      Pusher::push_to_aggregators options
     end
   end
 end

@@ -5,7 +5,6 @@ require 'ess/pusher'
 module ESS
   class Element
     include ESS::Helpers
-    include ESS::Pusher
 
     attr_reader :dtd
 
@@ -16,6 +15,15 @@ module ESS
       @dtd = dtd
       @child_tags = {}
       @attributes = {}
+    end
+
+    def push_to_aggregators options={}
+      options = options.clone
+      if @name != :ess
+        raise RuntimeError, "only ESS root element can be pushed to aggregators"
+      end
+      options[:data] = self.to_xml!
+      Pusher::push_to_aggregators options
     end
 
     def name!
