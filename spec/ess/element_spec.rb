@@ -778,6 +778,41 @@ module ESS
           end
         end
       end
+
+      context "a price item" do
+        let(:element) do
+          element = Element.new(:item, DTD::PRICE_ITEM)
+          element.mode_attr "fixed"
+          element.name "An example price"
+          element.value 10
+          element.currency "USD"
+          element.start Time.now
+          element
+        end
+
+        context 'type is recurrent' do
+          before(:each) { element.type_attr "recurrent" }
+          context 'unit type is defined' do
+            it 'should be valid' do
+              element.unit_attr "month"
+              element.should be_valid
+            end
+          end
+          context 'unit type is not defined' do
+            it 'should not be valid' do
+              element.should_not be_valid
+            end
+          end
+        end
+
+        context 'type is standalone' do
+          before(:each) { element.type_attr "standalone" }
+
+          it 'should be valid without unit attr' do
+            element.should be_valid
+          end
+        end
+      end
     end
   end
 end

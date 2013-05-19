@@ -13,6 +13,7 @@ module ESS
       ess.version_attr options[:version]
       ess.lang_attr options[:lang]
       block.call(ess) if block
+      ess.channel.generator.text!("ess:ruby:generator:version:0.9") if ess.channel.generator.text! == ""
       ess.validate if options[:validate]
       return ess
     end

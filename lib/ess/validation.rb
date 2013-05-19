@@ -783,9 +783,9 @@ module ESS
     end
 
     class UnitMandatoryIfRecurrent
-      def validate date_item_tag
-        if date_item_tag.type_attr == "recurrent"
-          unless date_item_tag.unit_attr != ""
+      def validate item_tag
+        if item_tag.type_attr == "recurrent"
+          unless item_tag.unit_attr != ""
             raise InvalidValueError, "the \"unit\" attribute is mandatory in a date item if type is recurrent"
           end
         end

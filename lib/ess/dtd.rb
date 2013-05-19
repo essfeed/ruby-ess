@@ -268,7 +268,8 @@ module ESS
                  :uri => { :dtd => URL_ELEMENT,
                            :mandatory => false,
                            :max_occurs => 1 } },
-      :validation => [ CurrMandatoryIfValueGT0.new ]
+      :validation => [ CurrMandatoryIfValueGT0.new,
+                       UnitMandatoryIfRecurrent.new ]
     }
 
     PRICES = {
