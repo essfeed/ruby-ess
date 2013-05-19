@@ -1,5 +1,6 @@
 require 'ess/helpers'
 require 'time'
+require 'date'
 
 module ESS
   module Postprocessing
