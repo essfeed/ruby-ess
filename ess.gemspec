@@ -6,7 +6,7 @@ require 'ess/version'
 Gem::Specification.new do |gem|
   gem.name          = "ess"
   gem.version       = ESS::VERSION
-  gem.authors       = ["Marjan Povolni"]
+  gem.authors       = ["Marjan Povolni","Brice Pissard"]
   gem.email         = ["marian.povolny@gmail.com"]
   gem.description   = %q{Helper classes and methods for creating ESS XML feeds with Ruby.}
   gem.summary       = %q{Generate ESS XML feeds with Ruby}
