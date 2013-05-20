@@ -1,15 +1,13 @@
 ruby-ess
 ========
 
-Generate ESS XML feed with Ruby
-
-**Warning:** this library is still under heavy development!
+Generate ESS XML feeds with Ruby
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'ess'
+    gem 'ess', '~> 0.9.0'
 
 And then execute:
 
@@ -17,11 +15,11 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install ess
+    $ gem install ess -v 0.9.0
 
 ## Usage
 
-Producing your own ESS channels is easy. Here is an example about how
+Producing your own ESS feeds is easy. Here is an example about how
 it's done, with most of the available tags available in ESS:
 
 ```ruby
@@ -35,7 +33,6 @@ ess = Maker.make do |ess|
     channel.id "ESSID:50b4b412-1ad4-a731-1c6a-2523ffa33f81"
     channel.published "2012-12-13T08:29:29Z"
     channel.updated "2012-12-13T18:30:02-08:00"
-    channel.generator "ess:ruby:generator:version:0.9"
     channel.rights "Copyright (c) 2013, John Doe"
 
     channel.add_feed do |feed|
@@ -215,23 +212,22 @@ end
 
 ```
 
-As you can see, it's a very Builder-like DSL. The result of this code
-will be an ESS channel with one item. To get XML from it, you can use
-"channel.to_xml".
+As can be seen, it's a very Builder-like DSL. The result of this code
+will be an ESS feed with one item. To get XML from it, the 'to_xml!'
+method ca be used.
 
-To learn more about ESS and what tags and options are available,
-visit http://essfeed.org/ .
+More information on ESS and what tags and options are available can
+be found on http://essfeed.org/ .
 
-Note that when using the Maker class, the resulting channel is
-validated automatically at the end of the block. That means that
-before the block ends, you need to have specified  all the mandatory
-tags, with valid values. There is however an option to turn that
-behavior off, but you should have a good reason to do that. You can
-use it like this:
+### Pushing feeds to aggregators
+
+Once a feed is generated, it can be submitted to an aggregator easily.
+To send it to the default aggregator service, which is Hypecal, just
+add an option to the 'make' class method:
 
 ```ruby
 
-channel = Maker.make(:validate => false) do |channel|
+ess = Maker.make(:push => true) do |ess|
 
   ...
 
@@ -239,16 +235,176 @@ end
 
 ```
 
-You can use pretty much anything as the value for a tag, as long as
-it can be converted to a string with #to_s. Tags that accept date or
+Another way to do the same is to first generate the feed and assign
+the result to a variable, like 'ess' in previous example, and call its
+'push_to_aggregators' method. It accepts the same options and is
+useful for example when the feed has to be submitted in a dalayed job.
+
+In a Rails environment, if the feed is generated in response to a
+request, providing the request object to the maker method could
+provide the aggregator with more useful data:
+
+```ruby
+
+ess = Maker.make(:request => request) do |ess|
+
+  ...
+
+end
+
+```
+
+Should you want to provide a list of aggregator services yourself, it
+can be done with the aggregators option:
+
+```ruby
+
+ess = Maker.make(:aggregators => ['http://aggregator.example.com/api.json', ...]) do |ess|
+
+  ...
+
+end
+
+```
+
+Another option is to set a new default list of aggregator services
+using the Pusher class:
+
+```ruby
+
+ESS::Pusher.aggregators = ['http://aggregator.example.com/api.json', ...]
+
+```
+
+### Validation
+
+When using the Maker class, the resulting feed is
+validated automatically at the end of the block. That means that
+before the block ends, the feed has to have all the mandatory
+tags, with valid values. There is however an option to turn that
+behavior off, but there should be a good reason to do that.
+
+```ruby
+
+ess = Maker.make(:validate => false) do |ess|
+
+  ...
+
+end
+
+```
+
+The resulting object accepts the 'valid?' and 'validate' methods. The
+former returns true or false, while the later raises an exception with
+a message more useful for debugging.
+
+### Working with tags
+
+A tag with text can be specified like this:
+
+```ruby
+
+ess = Maker.make do |ess|
+  ess.channel do |channel|
+
+    channel.title "National Stadium Football events"
+
+    ...
+
+  end
+end
+
+```
+
+Each tag accepts method calls coresponding to child tag names. These
+methods can accept a string argument, which will become the text of
+the child tag, and/or a list of key/value pairs (options), which will
+become tag attributes.
+
+If there is also a block, it should expect one parameter which will
+be a reference to the child tag.
+
+For the case where a single tag can have multiple child tags with the
+same name, the following construct can be used:
+
+```ruby
+
+ess = Maker.make do |ess|
+  ess.channel do |channel|
+
+    channel.add_feed do |feed|
+
+      ...
+
+    end
+
+    channel.add_feed do |another_feed|
+
+      ...
+
+    end
+
+    end
+  end
+end
+
+```
+
+For every tag 'tag_name' its parent accepts an 'add_tag_name' method,
+which accepts the same arguments as a 'tag_name' method.
+
+Attributes have also their own methods for setting them, for example:
+
+```ruby
+
+ess = Maker.make do |ess|
+  ess.lang_attr "zu"
+
+  ...
+
+end
+
+```
+
+Here the 'lang' attribute of the ess tag is set to "zu". And there is
+also a 'text!' method, which can be used to set a tags text:
+
+```ruby
+
+ess = Maker.make do |ess|
+  ess.channel do |channel|
+
+    channel.title do |title|
+      title.text! "National Stadium Football events"
+    end
+
+    ...
+
+  end
+end
+
+```
+
+Again, more information on ESS and what tags and options are available
+can be found on http://essfeed.org/ .
+
+### Valid tag and attribute values
+
+Pretty much anything can be used as the value for a tag, as long as
+it can be converted to a string with #to_s.
+
+Tags that accept date or
 time will accept Time objects too, which will be converted to the
 corrent format, which is ISO-8601 for ESS. However, if the value is a
-string, it will be automatically converted to the ISO-8601 format.
+string, an attempt will be made to automatically convert the value
+to the ISO-8601 format.
 
-One more note about ID tags. The channel and feed ID tags can also be
+### IDs
+
+The channel and feed ID tags can also be
 computed automatically, they don't need to be set by hand. They are
-automatically calculated and set each time you change the TITLE or
-URI/LINK tags. Also, instead of using a valid ID value, any string
+automatically calculated and set the first time the TITLE or URI/LINK
+tags are changed. Also, instead of using a valid ID value, any string
 can be assigned to the ID tag of a channel or feed, and if it doesn't
 start with "ESSID:" or "EVENTID:", it will be regenerated using that
 string as the key.
@@ -285,3 +441,4 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
