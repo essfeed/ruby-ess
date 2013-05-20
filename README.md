@@ -1,6 +1,10 @@
 ruby-ess
 ========
 
+#### https://github.com/essfeed/rails-ess 
+                                                                                    
+[![ESS Feed Standard](http://essfeed.org/images/8/87/ESS_logo_32x32.png)](http://essfeed.org/)
+
 Generate ESS XML feeds with Ruby
 
 ## Installation
