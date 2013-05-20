@@ -14,7 +14,7 @@ module ESS
       ess.version_attr options[:version]
       ess.lang_attr options[:lang]
       block.call(ess) if block
-      ess.channel.generator.text!("ess:ruby:generator:version:#{VERSION}") if ess.channel.generator.text! == ""
+      ess.channel.generator.text!("ess:ruby:generator:version:#{options[:version]}") if ess.channel.generator.text! == ""
       ess.validate if options[:validate]
       ess.push_to_aggregators(options) if options[:push] || options[:aggregators]
       return ess
