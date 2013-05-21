@@ -30,7 +30,7 @@ it's done, with most of the available tags available in ESS:
 
 require 'ess'
 
-ess = Maker.make do |ess|
+ess = ESS::Maker.make do |ess|
   ess.channel do |channel|
     channel.title "National Stadium Football events"
     channel.link "http://sample.com/feeds/sample.ess"
@@ -231,7 +231,7 @@ add an option to the 'make' class method:
 
 ```ruby
 
-ess = Maker.make(:push => true) do |ess|
+ess = ESS::Maker.make(:push => true) do |ess|
 
   ...
 
@@ -250,7 +250,7 @@ provide the aggregator with more useful data:
 
 ```ruby
 
-ess = Maker.make(:request => request) do |ess|
+ess = ESS::Maker.make(:request => request) do |ess|
 
   ...
 
@@ -263,7 +263,7 @@ can be done with the aggregators option:
 
 ```ruby
 
-ess = Maker.make(:aggregators => ['http://aggregator.example.com/api.json', ...]) do |ess|
+ess = ESS::Maker.make(:aggregators => ['http://aggregator.example.com/api.json', ...]) do |ess|
 
   ...
 
@@ -272,7 +272,7 @@ end
 ```
 
 Another option is to set a new default list of aggregator services
-using the Pusher class:
+using the ESS::Pusher class:
 
 ```ruby
 
@@ -282,7 +282,7 @@ ESS::Pusher.aggregators = ['http://aggregator.example.com/api.json', ...]
 
 ### Validation
 
-When using the Maker class, the resulting feed is
+When using the ESS::Maker class, the resulting feed is
 validated automatically at the end of the block. That means that
 before the block ends, the feed has to have all the mandatory
 tags, with valid values. There is however an option to turn that
@@ -290,7 +290,7 @@ behavior off, but there should be a good reason to do that.
 
 ```ruby
 
-ess = Maker.make(:validate => false) do |ess|
+ess = ESS::Maker.make(:validate => false) do |ess|
 
   ...
 
@@ -308,7 +308,7 @@ A tag with text can be specified like this:
 
 ```ruby
 
-ess = Maker.make do |ess|
+ess = ESS::Maker.make do |ess|
   ess.channel do |channel|
 
     channel.title "National Stadium Football events"
@@ -333,7 +333,7 @@ same name, the following construct can be used:
 
 ```ruby
 
-ess = Maker.make do |ess|
+ess = ESS::Maker.make do |ess|
   ess.channel do |channel|
 
     channel.add_feed do |feed|
@@ -361,7 +361,7 @@ Attributes have also their own methods for setting them, for example:
 
 ```ruby
 
-ess = Maker.make do |ess|
+ess = ESS::Maker.make do |ess|
   ess.lang_attr "zu"
 
   ...
@@ -375,7 +375,7 @@ also a 'text!' method, which can be used to set a tags text:
 
 ```ruby
 
-ess = Maker.make do |ess|
+ess = ESS::Maker.make do |ess|
   ess.channel do |channel|
 
     channel.title do |title|
