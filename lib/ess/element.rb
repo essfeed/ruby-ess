@@ -71,6 +71,18 @@ module ESS
       to_xml!
     end
 
+    def disable_postprocessing
+      @@postprocessing_disabled = true
+    end
+
+    def enable_postprocessing
+      @@postprocessing_disabled = false
+    end
+
+    def postprocessing_disabled?
+      @@postprocessing_disabled ||= false
+    end
+
     def method_missing m, *args, &block
       if method_name_is_tag_name? m
         return assign_tag(m, args, &block)
@@ -156,8 +168,10 @@ module ESS
       end
 
       def run_post_processing tag
-        if @dtd[:tags][tag.name!].keys.include? :postprocessing
-          @dtd[:tags][tag.name!][:postprocessing].each { |processor| processor.process(self, tag) }
+        unless postprocessing_disabled?
+          if @dtd[:tags][tag.name!].keys.include? :postprocessing
+            @dtd[:tags][tag.name!][:postprocessing].each { |processor| processor.process(self, tag) }
+          end
         end
       end
 
@@ -170,10 +184,12 @@ module ESS
       end
 
       def do_text_postprocessing_of text
-        text = text.to_s if text.class != String
-        if @dtd.include? :postprocessing_text
-          @dtd[:postprocessing_text].each do |processor|
-            text = processor.process text
+        unless postprocessing_disabled?
+          text = text.to_s if text.class != String
+          if @dtd.include? :postprocessing_text
+            @dtd[:postprocessing_text].each do |processor|
+              text = processor.process text
+            end
           end
         end
         text
