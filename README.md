@@ -9,7 +9,7 @@ Generate ESS XML feeds with Ruby
 
 Add this line to your application's Gemfile:
 
-    gem 'ess', '~> 0.9.1'
+    gem 'ess', '~> 0.9.3'
 
 And then execute:
 
@@ -17,7 +17,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install ess -v 0.9.1
+    $ gem install ess -v 0.9.3
 
 ## Usage
 
