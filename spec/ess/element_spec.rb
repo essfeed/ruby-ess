@@ -7,8 +7,8 @@ module ESS
 
     describe '#new' do
       it 'should require a name and a DTD argument' do
-        expect { Element.new }.to raise_error
-        expect { Element.new :tag_name }.to raise_error
+        expect { Element.new }.to raise_error(ArgumentError)
+        expect { Element.new :tag_name }.to raise_error(ArgumentError)
       end
 
       it 'should accept a hash with both :attributes and :tags keys' do
@@ -68,9 +68,9 @@ module ESS
       let(:element) { Element.new(:tags, DTD::TAGS) }
 
       it 'should return an error when trying to set an invalid tag' do
-        expect { element.bad "Example text" }.to raise_error
-        expect { element.bad }.to raise_error
-        expect { element.add_bad "Example text" }.to raise_error
+        expect { element.bad "Example text" }.to raise_error(NoMethodError)
+        expect { element.bad }.to raise_error(NoMethodError)
+        expect { element.add_bad "Example text" }.to raise_error(NoMethodError)
       end
 
       describe '#tag' do
@@ -250,19 +250,7 @@ module ESS
       end
 
       it 'should raise error if an invalid value was used for an attribute' do
-        expect { element.type_attr "bad_value" }.to raise_error
-      end
-
-      it 'should allow multiple comma separated valid values' do
-        lambda {
-          element.selected_day_attr "friday,saturday"
-        }.should_not raise_error
-      end
-
-      it 'should raise error if one value is valid and the other is not' do
-        expect {
-          element.selected_day_attr "friday,bad"
-        }.to raise_error
+        expect { element.type_attr "bad_value" }.to raise_error(DTD::InvalidValueError)
       end
     end
 
@@ -355,7 +343,7 @@ module ESS
         end
 
         it 'should not allow other values' do
-          expect { element.access "bad" }.to raise_error
+          expect { element.access "bad" }.to raise_error(DTD::InvalidValueError)
         end
       end
     end
@@ -650,7 +638,7 @@ module ESS
           it 'should raise an error' do
             lambda {
               element.validate
-            }.should raise_error
+            }.should raise_error(Validation::ValidationError)
           end
         end
       end
@@ -753,6 +741,42 @@ module ESS
           it 'should be valid without unit attr' do
             element.should be_valid
           end
+        end
+      end
+
+      context "a date item with selected_day attribute" do
+        let(:item) do
+          element = Element.new :item, DTD::DATE_ITEM
+          element.type_attr "recurrent"
+          element.unit_attr "month"
+          element.name "A date"
+          element.start Time.now
+          element
+        end
+
+        it 'should be invalid if the attribute has a random value' do
+          item.selected_day_attr "randomvalue"
+          item.should_not be_valid
+        end
+
+        it 'should be valid if the value is a day of the week' do
+          item.selected_day_attr "tuesday"
+          item.should be_valid
+        end
+
+        it 'should be valid if the value is a number' do
+          item.selected_day_attr "1"
+          item.should be_valid
+        end
+
+        it 'should be valid if the value is a comma-separated array of names of days of the week' do
+          item.selected_day_attr "monday,tuesday,sunday"
+          item.should be_valid
+        end
+
+        it 'should be valid if the value is a comma-separated array of numbers' do
+          item.selected_day_attr "1,30,31"
+          item.should be_valid
         end
       end
 

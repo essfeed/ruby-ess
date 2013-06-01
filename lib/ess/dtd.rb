@@ -106,11 +106,7 @@ module ESS
                        :interval => { :mandatory => false,
                                       :max_occurs => 1 },
                        :selected_day => { :mandatory => false,
-                                          :max_occurs => :inf,
-                                          :valid_values => [
-                                            'number','monday','tuesday',
-                                            'wednesday','thursday','friday',
-                                            'saturday','sunday'] },
+                                          :max_occurs => :inf },
                        :selected_week => { :mandatory => false,
                                            :max_occurs => :inf,
                                            :valid_values => [
@@ -127,7 +123,8 @@ module ESS
                  :duration => { :dtd => BASIC_ELEMENT,
                                 :mandatory => false,
                                 :max_occurs => 1 } },
-      :validation => [ UnitMandatoryIfRecurrent.new ]
+      :validation => [ UnitMandatoryIfRecurrent.new,
+                       SelectedDayCheck.new ]
     }
 
     DATES = {
@@ -216,11 +213,7 @@ module ESS
                        :interval => { :mandatory => false,
                                       :max_occurs => 1 },
                        :selected_day => { :mandatory => false,
-                                          :max_occurs => :inf,
-                                          :valid_values => [
-                                            'number','monday','tuesday',
-                                            'wednesday','thursday','friday',
-                                            'saturday','sunday'] },
+                                          :max_occurs => :inf },
                        :selected_week => { :mandatory => false,
                                            :max_occurs => :inf,
                                            :valid_values => [
@@ -247,7 +240,8 @@ module ESS
                            :mandatory => false,
                            :max_occurs => 1 } },
       :validation => [ CurrMandatoryIfValueGT0.new,
-                       UnitMandatoryIfRecurrent.new ]
+                       UnitMandatoryIfRecurrent.new,
+                       SelectedDayCheck.new ]
     }
 
     PRICES = {

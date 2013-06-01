@@ -10,7 +10,7 @@ module ESS
     class TextIsNotNull
       def validate tag
         if tag.text!.strip == ''
-          raise InvalidValueError, "the <#{tag.tag_name}> element cannot be empty"
+          raise ValidationError, "the <#{tag.tag_name}> element cannot be empty"
         end
       end
     end
@@ -25,7 +25,7 @@ module ESS
       def validate_url text
         unless text =~ /^(http|https|ftp):\/\/([A-Z0-9][A-Z0-9_-]*(?:\.[A-Z0-9][A-Z0-9_-]*)+):?(\d+)?\/?/i || text.length > 10
           unless isValidIP text
-            raise InvalidValueError, "invalid URL: #{text}"
+            raise ValidationError, "invalid URL: #{text}"
           end
         end
       end
@@ -54,7 +54,7 @@ module ESS
     class TextIsValidLatitude
       def validate tag
         unless tag.text! =~ /^-?([0-8]?[0-9]|90)\.[0-9]{1,6}$/
-          raise InvalidValueError, "invalid latitude: #{tag.text!}"
+          raise ValidationError, "invalid latitude: #{tag.text!}"
         end
       end
     end
@@ -62,7 +62,7 @@ module ESS
     class TextIsValidLongitude
       def validate tag
         unless tag.text! =~ /^-?((1?[0-7]?|[0-9]?)[0-9]|180)\.[0-9]{1,6}$/
-          raise InvalidValueError, "invalid longitude: #{tag.text!}"
+          raise ValidationError, "invalid longitude: #{tag.text!}"
         end
       end
     end
@@ -321,7 +321,7 @@ module ESS
 
       def validate tag
         unless COUNTRY_CODES.keys.include? tag.text!.strip.upcase
-          raise InvalidValueError, "invalid country code: #{tag.text!}"
+          raise ValidationError, "invalid country code: #{tag.text!}"
         end
       end
     end
@@ -572,7 +572,7 @@ module ESS
 
       def validate tag
         unless CURRENCIES.values.include? tag.text!.strip.upcase
-          raise InvalidValueError, "invalid currency: #{tag.text!}"
+          raise ValidationError, "invalid currency: #{tag.text!}"
         end
       end
     end
@@ -581,7 +581,7 @@ module ESS
       def validate price_tag
         if price_tag.value.text!.to_i != 0
           if price_tag.currency.text! == ""
-            raise InvalidValueError, "the <currency> element of a price item cannot be empty if <value> is not 0"
+            raise ValidationError, "the <currency> element of a price item cannot be empty if <value> is not 0"
           end
         end
       end
@@ -777,7 +777,7 @@ module ESS
 
       def validate ess_tag
         unless LANGUAGES.has_key?(ess_tag.lang_attr) || ess_tag.lang_attr == ""
-          raise InvalidValueError, "the \"lang\" attribute value is invalid: #{ess_tag.lang_attr}"
+          raise ValidationError, "the \"lang\" attribute value is invalid: #{ess_tag.lang_attr}"
         end
       end
     end
@@ -786,7 +786,22 @@ module ESS
       def validate item_tag
         if item_tag.type_attr == "recurrent"
           unless item_tag.unit_attr != ""
-            raise InvalidValueError, "the \"unit\" attribute is mandatory in a date item if type is recurrent"
+            raise ValidationError, "the \"unit\" attribute is mandatory in a date item if type is recurrent"
+          end
+        end
+      end
+    end
+
+    DAYS_OF_WEEK = [ 'monday', 'tuesday', 'wednesday', 'thursday', 'friday',
+                     'saturday', 'sunday']
+    class SelectedDayCheck
+      def validate date_item_tag
+        sday = date_item_tag.selected_day_attr
+        if !sday.empty?
+          values = sday.split(",")
+          bad_values = values.delete_if { |day| DAYS_OF_WEEK.include?(day) || day.to_i.to_s == day }
+          if bad_values.any?
+            raise ValidationError, "the values \"#{bad_values}\" are not allowed in the \"selected_day\" attribute of date items"
           end
         end
       end

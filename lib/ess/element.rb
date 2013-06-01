@@ -131,7 +131,7 @@ module ESS
         if args.length > 0 && args[0].class != Hash
           if @dtd[:tags][m].include? :valid_values
             unless @dtd[:tags][m][:valid_values].include?(args[0])
-              raise InvalidValueError, "\"#{args[0]}\" is not a valid value for the #{m} tag"
+              raise DTD::InvalidValueError, "\"#{args[0]}\" is not a valid value for the #{m} tag"
             end
           end
           tag_list[0].text!(args[0])
