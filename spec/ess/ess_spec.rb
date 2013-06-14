@@ -12,7 +12,7 @@ module ESS
           feed.dates.add_item do |item|
             item.type_attr "standalone"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-01 00:00")
+            item.start Time.parse("#{future_year}-01-01T00:00:00Z")
           end
         end
         ess
@@ -28,13 +28,13 @@ module ESS
 
       describe '#find_between' do
         it 'should return that one item in an array if it\'s between the two moments in time' do
-          feeds = ess.find_between(Time.parse("#{future_year-1}-12-31 23:59"), Time.parse("#{future_year}-01-01 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year-1}-12-31T23:59:00Z"), Time.parse("#{future_year}-01-01T00:01:00Z"))
           feeds.length.should == 1
           feeds[0][:feed].title.text!.should == "Feed 1"
         end
 
         it 'should return an empty array if the item event is not between the two moments in time' do
-          feeds = ess.find_between(Time.parse("#{future_year}-01-01 00:01"), Time.parse("#{future_year}-01-01 00:03"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-01T00:01:00Z"), Time.parse("#{future_year}-01-01T00:03:00Z"))
           feeds.length.should == 0
         end
       end
@@ -48,7 +48,7 @@ module ESS
           feed.dates.add_item do |item|
             item.type_attr "standalone"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-01 00:00")
+            item.start Time.parse("#{future_year}-01-01T00:00:00Z")
           end
         end
         ess.channel.add_feed do |feed|
@@ -56,7 +56,7 @@ module ESS
           feed.dates.add_item do |item|
             item.type_attr "standalone"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-08 00:00")
+            item.start Time.parse("#{future_year}-01-08T00:00:00Z")
           end
         end
         ess
@@ -105,26 +105,26 @@ module ESS
 
       describe '#find_between' do
         it 'should return an empty list if none of the events is between two moments in time' do
-          feeds = ess.find_between(Time.parse("#{future_year-1}-12-21 23:59"), Time.parse("#{future_year-1}-12-31 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year-1}-12-21T23:59:00Z"), Time.parse("#{future_year-1}-12-31T00:01:00Z"))
           feeds.length.should == 0
-          feeds = ess.find_between(Time.parse("#{future_year}-01-10 23:59"), Time.parse("#{future_year}-01-13 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-10T23:59:00Z"), Time.parse("#{future_year}-01-13T00:01:00Z"))
           feeds.length.should == 0
         end
 
         it 'should return the first feed if it is happening between the two dates' do
-          feeds = ess.find_between(Time.parse("#{future_year-1}-12-21 23:59"), Time.parse("#{future_year}-01-05 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year-1}-12-21T23:59:00Z"), Time.parse("#{future_year}-01-05T00:01:00Z"))
           feeds.length.should == 1
           feeds[0][:feed].title.text!.should == "Feed 1"
         end
 
         it 'should return the second feed if it is happening between the two dates' do
-          feeds = ess.find_between(Time.parse("#{future_year}-01-01 00:02"), Time.parse("#{future_year}-01-09 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-01T00:02:00Z"), Time.parse("#{future_year}-01-09T00:01:00Z"))
           feeds.length.should == 1
           feeds[0][:feed].title.text!.should == "Feed 2"
         end
 
         it 'should return both items if they both happen in the interval' do
-          feeds = ess.find_between(Time.parse("#{future_year}-01-01 00:00"), Time.parse("#{future_year}-01-09 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-01T00:00:00Z"), Time.parse("#{future_year}-01-09T00:01:00Z"))
           feeds.length.should == 2
           feeds[0][:feed].title.text!.should == "Feed 1"
           feeds[1][:feed].title.text!.should == "Feed 2"
@@ -140,12 +140,12 @@ module ESS
           feed.dates.add_item do |item|
             item.type_attr "standalone"
             item.name "Date 2"
-            item.start Time.parse("#{future_year}-01-01 00:15")
+            item.start Time.parse("#{future_year}-01-01T00:15:00Z")
           end
           feed.dates.add_item do |item|
             item.type_attr "standalone"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-01 00:00")
+            item.start Time.parse("#{future_year}-01-01T00:00:00Z")
           end
         end
         ess
@@ -170,21 +170,21 @@ module ESS
 
         it 'should return a list of discts sorted by ascending order of time' do
           feeds = ess.find_coming
-          feeds[0][:time].should == Time.parse("#{future_year}-01-01 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-01-01T00:00:00Z")
           feeds[0][:feed].title.text!.should == "Feed 1"
-          feeds[1][:time].should == Time.parse("#{future_year}-01-01 00:15")
+          feeds[1][:time].should == Time.parse("#{future_year}-01-01T00:15:00Z")
           feeds[1][:feed].title.text!.should == "Feed 1"
         end
       end
 
       describe "#find_between" do
         it 'should return two items in a list, if both date items are within the time period' do
-          feeds = ess.find_between(Time.parse("#{future_year}-01-01 00:00"), Time.parse("#{future_year}-01-09 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-01T00:00:00Z"), Time.parse("#{future_year}-01-09T00:01:00Z"))
           feeds.length == 2
         end
 
         it 'should return two hashes in a list, with :time and :feed values defined' do
-          feeds = ess.find_between(Time.parse("#{future_year}-01-01 00:00"), Time.parse("#{future_year}-01-09 00:01"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-01T00:00:00Z"), Time.parse("#{future_year}-01-09T00:01:00Z"))
           feeds.each do |feed|
             feed[:time].should_not be_nil
             feed[:feed].should_not be_nil
@@ -193,9 +193,9 @@ module ESS
 
         it 'should return a list of dicts sorted by ascending order of time' do
           feeds = ess.find_coming
-          feeds[0][:time].should == Time.parse("#{future_year}-01-01 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-01-01T00:00:00Z")
           feeds[0][:feed].title.text!.should == "Feed 1"
-          feeds[1][:time].should == Time.parse("#{future_year}-01-01 00:15")
+          feeds[1][:time].should == Time.parse("#{future_year}-01-01T00:15:00Z")
           feeds[1][:feed].title.text!.should == "Feed 1"
         end
       end
@@ -211,7 +211,7 @@ module ESS
             item.unit_attr "month"
             item.limit_attr "5"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-01 00:00")
+            item.start Time.parse("#{future_year}-01-01T00:00:00Z")
           end
         end
         ess
@@ -224,21 +224,21 @@ module ESS
 
         it 'should return a list of feeds, sorted by starting date/time' do
           feeds = ess.find_coming
-          feeds[0][:time].should == Time.parse("#{future_year}-01-01 00:00")
-          feeds[1][:time].should == Time.parse("#{future_year}-02-01 00:00")
-          feeds[2][:time].should == Time.parse("#{future_year}-03-01 00:00")
-          feeds[3][:time].should == Time.parse("#{future_year}-04-01 00:00")
-          feeds[4][:time].should == Time.parse("#{future_year}-05-01 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-01-01T00:00:00Z")
+          feeds[1][:time].should == Time.parse("#{future_year}-02-01T00:00:00Z")
+          feeds[2][:time].should == Time.parse("#{future_year}-03-01T00:00:00Z")
+          feeds[3][:time].should == Time.parse("#{future_year}-04-01T00:00:00Z")
+          feeds[4][:time].should == Time.parse("#{future_year}-05-01T00:00:00Z")
         end
       end
 
       describe "#find_coming" do
         it 'should return a list of event instances within time boundaries' do
-          feeds = ess.find_between(Time.parse("#{future_year}-02-11 00:00"), Time.parse("#{future_year}-07-11 12:00"))
+          feeds = ess.find_between(Time.parse("#{future_year}-02-11T00:00:00Z"), Time.parse("#{future_year}-07-11T12:00:00Z"))
           feeds.length.should == 3
-          feeds[0][:time].should == Time.parse("#{future_year}-03-01 00:00")
-          feeds[1][:time].should == Time.parse("#{future_year}-04-01 00:00")
-          feeds[2][:time].should == Time.parse("#{future_year}-05-01 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-03-01T00:00:00Z")
+          feeds[1][:time].should == Time.parse("#{future_year}-04-01T00:00:00Z")
+          feeds[2][:time].should == Time.parse("#{future_year}-05-01T00:00:00Z")
         end
       end
     end
@@ -254,7 +254,7 @@ module ESS
             item.interval_attr "2"
             item.limit_attr "5"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-01 00:00")
+            item.start Time.parse("#{future_year}-01-01T00:00:00Z")
           end
         end
         ess
@@ -267,21 +267,21 @@ module ESS
 
         it 'should return a list of feeds, sorted by starting date/time' do
           feeds = ess.find_coming
-          feeds[0][:time].should == Time.parse("#{future_year}-01-01 00:00")
-          feeds[1][:time].should == Time.parse("#{future_year}-03-01 00:00")
-          feeds[2][:time].should == Time.parse("#{future_year}-05-01 00:00")
-          feeds[3][:time].should == Time.parse("#{future_year}-07-01 00:00")
-          feeds[4][:time].should == Time.parse("#{future_year}-09-01 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-01-01T00:00:00Z")
+          feeds[1][:time].should == Time.parse("#{future_year}-03-01T00:00:00Z")
+          feeds[2][:time].should == Time.parse("#{future_year}-05-01T00:00:00Z")
+          feeds[3][:time].should == Time.parse("#{future_year}-07-01T00:00:00Z")
+          feeds[4][:time].should == Time.parse("#{future_year}-09-01T00:00:00Z")
         end
       end
 
       describe "#find_between" do
         it 'should return a list of feeds between the two dates it received as parameters' do
-          feeds = ess.find_between(Time.parse("#{future_year}-03-11 00:00"), Time.parse("#{future_year}-10-11 00:00"))
+          feeds = ess.find_between(Time.parse("#{future_year}-03-11T00:00:00Z"), Time.parse("#{future_year}-10-11T00:00:00Z"))
           feeds.length.should == 3
-          feeds[0][:time].should == Time.parse("#{future_year}-05-01 00:00")
-          feeds[1][:time].should == Time.parse("#{future_year}-07-01 00:00")
-          feeds[2][:time].should == Time.parse("#{future_year}-09-01 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-05-01T00:00:00Z")
+          feeds[1][:time].should == Time.parse("#{future_year}-07-01T00:00:00Z")
+          feeds[2][:time].should == Time.parse("#{future_year}-09-01T00:00:00Z")
         end
       end
     end
@@ -297,7 +297,7 @@ module ESS
             item.limit_attr "5"
             item.selected_day_attr "2"
             item.name "Date 1"
-            item.start Time.parse("#{future_year}-01-02 00:00")
+            item.start Time.parse("#{future_year}-01-02T00:00:00Z")
           end
         end
         ess
@@ -307,11 +307,11 @@ module ESS
         it 'should return events only on those days specified in the selected_day attribute' do
           feeds = ess.find_coming
           feeds.length.should == 5
-          feeds[0][:time].should == Time.parse("#{future_year}-01-02 00:00")
-          feeds[1][:time].should == Time.parse("#{future_year}-02-02 00:00")
-          feeds[2][:time].should == Time.parse("#{future_year}-03-02 00:00")
-          feeds[3][:time].should == Time.parse("#{future_year}-04-02 00:00")
-          feeds[4][:time].should == Time.parse("#{future_year}-05-02 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-01-02T00:00:00Z")
+          feeds[1][:time].should == Time.parse("#{future_year}-02-02T00:00:00Z")
+          feeds[2][:time].should == Time.parse("#{future_year}-03-02T00:00:00Z")
+          feeds[3][:time].should == Time.parse("#{future_year}-04-02T00:00:00Z")
+          feeds[4][:time].should == Time.parse("#{future_year}-05-02T00:00:00Z")
         end
 
         it 'should support using day names' do
@@ -327,16 +327,16 @@ module ESS
 
       describe "#find_between" do
         it 'should return events only on those days specified in the selected_day attribute' do
-          feeds = ess.find_between(Time.parse("#{future_year}-01-05 00:00"), Time.parse("#{future_year}-04-06 00:00"))
+          feeds = ess.find_between(Time.parse("#{future_year}-01-05 00:00"), Time.parse("#{future_year}-04-06T00:00:00Z"))
           feeds.length.should == 3
-          feeds[0][:time].should == Time.parse("#{future_year}-02-02 00:00")
-          feeds[1][:time].should == Time.parse("#{future_year}-03-02 00:00")
-          feeds[2][:time].should == Time.parse("#{future_year}-04-02 00:00")
+          feeds[0][:time].should == Time.parse("#{future_year}-02-02T00:00:00Z")
+          feeds[1][:time].should == Time.parse("#{future_year}-03-02T00:00:00Z")
+          feeds[2][:time].should == Time.parse("#{future_year}-04-02T00:00:00Z")
         end
 
         it 'should support using day names' do
           ess.channel.feed.dates.item.selected_day_attr "monday"
-          feeds = ess.find_between(Time.parse("#{future_year}-02-01 00:00"), Time.parse("#{future_year}-04-30 00:00"))
+          feeds = ess.find_between(Time.parse("#{future_year}-02-01T00:00:00Z"), Time.parse("#{future_year}-04-30T00:00:00Z"))
           feeds.length.should be > 11
           feeds.length.should be < 16
           feeds.each do |event|

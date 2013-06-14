@@ -264,7 +264,7 @@ module ESS
 
             feed.dates.add_item :type => "recurrent", :unit => "month", :limit => 6, :selected_day => "saturday", :selected_week => "first,last" do |item|
               item.name "Course the first and last Saturdays of every month"
-              item.start "2013-10-25T15:30:00Z"
+              item.start "2013-10-05T15:30:00Z"
               item.duration "21600"
             end
 

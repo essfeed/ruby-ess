@@ -222,6 +222,10 @@ module ESS
       end
 
       def days_in_month time
+        self.class.days_in_month time
+      end
+
+      def self.days_in_month time
         case time.month
         when 1, 3, 5, 7, 8, 10, 12
           31
@@ -280,34 +284,22 @@ module ESS
           else
             increment = 60*60*24*28
           end
-        elsif [1,3,5,7,8,10,12].include? time.month
-          increment = 60*60*24*31
         else
-          increment = 60*60*24*30
+          increment = 60*60*24*days_in_month(time)
         end
-        fix_for_dst(time, time + increment)
+        time + increment
       end
 
       def self.inc_week time
-        fix_for_dst(time, time + 60*60*24*7)
+        time + 60*60*24*7
       end
 
       def self.inc_day
-        fix_for_dst(time, time + 60*60*24)
+        time + 60*60*24
       end
 
       def self.inc_hour
         kime + 3600
-      end
-
-      def self.fix_for_dst original_time, new_time
-        if original_time.hour != new_time.hour
-          new_time = new_time + (original_time.hour - new_time.hour) * 3600
-        end
-        if original_time.min != new_time.min
-          new_time = new_time + (original_time.min - new_time.min) * 60
-        end
-        new_time
       end
   end
 end
