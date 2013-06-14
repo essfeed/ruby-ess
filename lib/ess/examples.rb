@@ -48,7 +48,7 @@ module ESS
               item.selected_day_attr "saturday,sunday"
 
               item.name "Match Date"
-              item.start "2011-12-13T18:30:02Z"
+              item.start "2011-12-17T18:30:02Z"
               item.duration "10800"
             end
 

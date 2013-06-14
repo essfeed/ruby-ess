@@ -245,12 +245,23 @@ module ESS
         current_wday = current.wday
         current_wday = 7 if current_wday == 0
         if WEEK_DAYS.keys.include? day
-          all << change_time(current, :day => (current.day + WEEK_DAYS[day] - current_wday))
+          next_day = current.day + WEEK_DAYS[day] - current_wday
         elsif day.to_i.to_s == day
-          all << change_time(current, :day => (current.day + day.to_i - current_wday))
+          next_day = current.day + day.to_i - current_wday
         else
           raise InvalidValueError, "the \"#{day}\" value is not valid for a date item selected_day attribute"
         end
+        month = current.month
+        if next_day > days_in_month(current)
+          next_day -= days_in_month(current)
+          month += 1
+        end
+        year = current.year
+        if month > 12
+          month -= 12
+          year += 1
+        end
+        all << change_time(current, :year => year, :month => month, :day => next_day)
       end
 
       def self.inc_year time

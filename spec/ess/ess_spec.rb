@@ -344,7 +344,6 @@ module ESS
           end
         end
       end
-
     end
   end
 end
