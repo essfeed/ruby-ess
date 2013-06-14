@@ -3,8 +3,17 @@ require 'time'
 
 module ESS
   module Validation
+    ##
+    # Varous classes for validation of tag values. Should not be used directly,
+    # instances of it's classes are part of the DTD.
+    #
 
     class ValidationError < StandardError
+      ##
+      # This exception is generated when the validator find an error
+      # in the document. It should contain a message describing what
+      # was the value which caused it to be raised.
+      #
     end
 
     class TextIsNotNull

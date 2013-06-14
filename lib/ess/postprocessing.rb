@@ -4,6 +4,10 @@ require 'date'
 
 module ESS
   module Postprocessing
+    ##
+    # Varous classes for postprocessing tag values. Should not be used directly,
+    # instances of it's classes are part of the DTD.
+    #
     class FeedTitle
       def process feed_tag, title_tag
         feed_tag.id(title_tag.text!) if feed_tag.id.text! == ""

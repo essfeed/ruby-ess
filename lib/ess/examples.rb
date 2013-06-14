@@ -1,5 +1,8 @@
 module ESS
   module Examples
+    ##
+    # Example feeds for documentation and testing.
+    #
 
     def self.from_essfeeds_org_home
       ess = Maker.make do |ess|

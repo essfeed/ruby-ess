@@ -6,6 +6,23 @@ module ESS
       super :ess, DTD::ESS
     end
 
+    ##
+    # Returns the next n events from the moment specified in the second
+    # optional argument.
+    #
+    # === Parameters
+    #
+    # [n = 10] how many coming events should be returned
+    # [start_time] only events hapenning after this time will be considered
+    #
+    # === Returns
+    #
+    # A list of hashes, sorted by event start time, each hash having
+    # two keys:
+    #
+    # [:time] start time of the event
+    # [:feed] feed describing the event
+    #
     def find_coming n=10, start_time=nil
       start_time = Time.now if start_time.nil?
       feeds = []
@@ -35,6 +52,24 @@ module ESS
       return feeds[0..n-1]
     end
 
+    ##
+    # Returns all events starting after the time specified by the first
+    # parameter and before the time specified by the second parameter,
+    # which accept regular Time objects.
+    #
+    # === Parameters
+    #
+    # [start_time] will return only events starting after this moment
+    # [end_time] will return only events starting before this moment
+    #
+    # === Returns
+    #
+    # A list of hashes, sorted by event start time, each hash having
+    # two keys:
+    #
+    # [:time] start time of the event
+    # [:feed] feed describing the event
+    #
     def find_between start_time, end_time
       feeds = []
       channel.feed_list.each do |feed|

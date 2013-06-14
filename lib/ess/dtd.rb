@@ -3,6 +3,10 @@ require 'ess/validation'
 
 module ESS
   module DTD
+    ##
+    # The information in this module should not be used directly, it is
+    # intended for the document builder and parser.
+    #
     include ESS::Postprocessing
     include ESS::Validation
 
@@ -480,6 +484,12 @@ module ESS
     }
 
     class InvalidValueError < RuntimeError
+      ##
+      # This exception is generated when the builder or parser
+      # receive a value which is not valid for a tag or attribute.
+      # It should contain a message describing what was the value which
+      # caused it to be raised.
+      #
     end
   end
 end

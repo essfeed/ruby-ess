@@ -3,6 +3,9 @@ require 'digest/md5'
 
 module ESS
   module Helpers
+    ##
+    # Generates an UUID with the prefix specified, using the kay passed to it.
+    #
     def self.uuid key=nil, prefix='ESSID:'
       new_id = nil
       if key.nil?

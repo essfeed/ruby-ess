@@ -4,27 +4,61 @@ require 'ess/pusher'
 
 module ESS
   class Element
+    ##
+    # Objects of this class represent the various tags available in ESS
+    #
+
+
     include ESS::Helpers
 
-    attr_reader :dtd
+    ##
+    # Returns the dictionary describing this tag.
+    #
+    def dtd
+      return @dtd
+    end
 
+    ##
+    # There should never be a need to create an Element object yourself,
+    # except if you're the developer of this library. Use ESS::Maker.make
+    # if you need to create a new ESS document.
+    # 
+    # === Parameters
+    #
+    # [name] a symbol, the name of the tag being created
+    # [dtd] a hash describing the tag
+    #
     def initialize name, dtd
       @name, @dtd = name, dtd
     end
 
+    ##
+    # Return the name of the tag as a symbol.
+    #
     def name!
       @name
     end
 
+    ##
+    # Returns or sets the text contained in this tag
+    #
     def text! text=nil
       return @text ||= "" if text.nil?
       @text = do_text_postprocessing_of text
     end
 
+    ##
+    # Returns a short description of this object.
+    #
     def inspect
       "#<#{self.class}:#{object_id} text=\"#{@text}\">"
     end
 
+    ##
+    # Validates the tag according to its DTD and all child tags. Throws an
+    # ESS::Validation::ValidationError exception in case the document is
+    # incomplete or an invalid value if found.
+    #
     def validate
       run_tag_validators
       check_attributes
@@ -32,6 +66,10 @@ module ESS
       return nil # if no errors found, i.e. no exceptions have been raised
     end
 
+    ##
+    # Same as #validate, but returns false if an error is found, instead of
+    # throwing exceptions.
+    #
     def valid?
       begin
         validate
@@ -41,6 +79,11 @@ module ESS
       return true
     end
 
+    ##
+    # Returns the feed as an XML document in a string. An Builder::XmlMarkup
+    # object can be passed as an argument and used as output, instead of
+    # generating a string object.
+    #
     def to_xml! xml=nil
       convert_to_string = true if xml.nil?
       xml = Builder::XmlMarkup.new if xml.nil?
@@ -61,28 +104,48 @@ module ESS
       xml.target! if convert_to_string
     end
 
+    ##
+    # A convenience method for pushing the current document to aggregators.
+    # It calls the ESS::Pusher.push_to_aggregators method and passes all
+    # options to it.
+    #
     def push_to_aggregators options={}
       raise RuntimeError, "only ESS root element can be pushed to aggregators" if @name != :ess
       options[:data] = self.to_xml!
       Pusher::push_to_aggregators options
     end
 
+    ##
+    # Same as #to_xml!, but accepts no arguments.
+    #
     def to_s
       to_xml!
     end
 
+    ##
+    # Disables postprocessing of tag values.
+    #
     def disable_postprocessing
       @@postprocessing_disabled = true
     end
 
+    ##
+    # Enables postprocessing of tag values.
     def enable_postprocessing
       @@postprocessing_disabled = false
     end
 
+    ##
+    # Returns true if postprocessing has been disabled.
+    #
     def postprocessing_disabled?
       @@postprocessing_disabled ||= false
     end
 
+    ##
+    # Handles methods corresponding to a tag name, ending with either
+    # _list or _attr, or starting with add_ .
+    #
     def method_missing m, *args, &block
       if method_name_is_tag_name? m
         return assign_tag(m, args, &block)

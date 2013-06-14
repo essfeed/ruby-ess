@@ -5,15 +5,53 @@ require 'uri'
 
 module ESS
   module Pusher
+    ##
+    # Sets the default aggregator services. Accepts a list of links in strings.
+    #
     def self.aggregators= aggs
       raise ArgumentError, "this method requires a list of links" if aggs.class != Array
       @@aggregators = aggs
     end
 
+    ##
+    # Returns the aggregator services currently set as default.
+    #
     def self.aggregators
       @@aggregators ||= ["http://api.hypecal.com/v1/ess/aggregator.json"]
     end
 
+    ##
+    # Pushes the feed to aggregators.
+    #
+    # === Options
+    #
+    # ==== :data
+    #
+    # A string, with an XML document representing the feed that needs to be
+    # pushed.
+    #
+    # ==== :feed
+    #
+    # This is an alternative to the :data option. This method accepts the feed
+    # link instead of the whole document. The aggregator service will pull the
+    # feed using this link.
+    #
+    # ==== :request
+    #
+    # This should be the request object that generated this feed. It can be
+    # useful for the aggregator service to receive some of th information
+    # from this object for crawling purposes.
+    #
+    # ==== :aggregators
+    #
+    # Intead of using the default aggregator services, this options can be used
+    # to specify what aggregators should the document be pushed to.
+    #
+    # ==== :ignore_errors
+    #
+    # The method will ignore any response from the aggregator services if this
+    # option is true. Default is false.
+    #
     def self.push_to_aggregators options={}
       options = { :aggregators => Pusher::aggregators,
                   :feed => nil,
