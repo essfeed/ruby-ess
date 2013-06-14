@@ -33,7 +33,7 @@ module ESS
       return feeds[0..n-1]
     end
 
-    def find_between start_time, end_time, max_events=1000
+    def find_between start_time, end_time
       feeds = []
       channel.feed_list.each do |feed|
         feed.dates.item_list.each do |item|
@@ -43,7 +43,7 @@ module ESS
               feeds << { :time => feed_start_time, :feed => feed }
             end
           elsif item.type_attr == "recurrent"
-            moments = parse_recurrent_date_item(item, max_events)
+            moments = parse_recurrent_date_item(item, end_time)
             moments.each do |moment|
               if moment.between?(start_time, end_time)
                 feeds << { :time => moment, :feed => feed }
@@ -86,16 +86,17 @@ module ESS
         "hour" => lambda { |time| inc_hour(time) }
       }
 
-      def parse_recurrent_date_item item, n
+      def parse_recurrent_date_item item, n_or_end_date
         current = first = Time.parse(item.start.text!)
         inc_period_func = INC_FUNCS[item.unit_attr || "hour"]
         interval = (item.interval_attr == "") ? 1 : item.interval_attr.to_i
         all = []
         if item.limit_attr.length == 0
+          break_func = (n.class == FixNum) ? lambda { all.length >= n_or_end_date } : lambda { current > n_or_end_date }
           while true
             parse_unit(item, current, all)
             interval.times do current = inc_period_func.call(current) end
-            break if all.length >= n
+            break if break_func.call
           end
         else
           item.limit_attr.to_i.times do

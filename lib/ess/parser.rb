@@ -7,7 +7,7 @@ module ESS
       doc = REXML::Document.new data
       ess = doc.root
       if ess.nil?
-        raise ArgumentError, "the first argument has to contain a valid xml document"
+        raise ArgumentError, "the argument has to contain a valid xml document"
       end
       new_ess = ESS.new
       new_ess.disable_postprocessing
