@@ -132,7 +132,7 @@ module ESS
                 item.country_code "US"
                 item.logo "http://sample.com/logo_120x60.png"
                 item.icon "http://sample.com/icon_64x64.png"
-                item.email "contact@sample.com"
+                item.email "contact@example.com"
                 item.phone "+001 (646) 234-5566"
               end
 

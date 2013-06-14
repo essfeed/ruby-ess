@@ -331,7 +331,7 @@ module ESS
                  :country_code => { :dtd => COUNTRY_CODE,
                                     :mandatory => false,
                                     :max_occurs => 1 },
-                 :email => { :dtd => BASIC_ELEMENT,
+                 :email => { :dtd => EMAIL,
                              :mandatory => false,
                              :max_occurs => 1 },
                  :phone => { :dtd => BASIC_ELEMENT,

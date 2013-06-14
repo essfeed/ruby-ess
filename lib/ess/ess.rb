@@ -243,7 +243,7 @@ module ESS
       def parse_week_day day, current, all
         day = day.downcase
         current_wday = current.wday
-        current_wday = 7 if current_wday = 0
+        current_wday = 7 if current_wday == 0
         if WEEK_DAYS.keys.include? day
           all << change_time(current, :day => (current.day + WEEK_DAYS[day] - current_wday))
         elsif day.to_i.to_s == day
