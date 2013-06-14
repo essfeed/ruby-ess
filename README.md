@@ -3,7 +3,7 @@ ruby-ess [![ESS Feed Standard](http://essfeed.org/images/8/87/ESS_logo_32x32.png
 
 [![Build Status](https://travis-ci.org/essfeed/ruby-ess.png)](https://travis-ci.org/essfeed/ruby-ess)
 
-Generate ESS XML feeds with Ruby
+Generate and parse ESS XML feeds with Ruby
 
 ## Installation
 
@@ -21,8 +21,9 @@ Or install it yourself as:
 
 ## Usage
 
-Producing your own ESS feeds is easy. Here is an example about how
-it's done, with most of the available tags available in ESS:
+Producing your own ESS feeds is easy. Here is a rather extensive
+example about how it's done, with most of the available tags
+available in ESS:
 
 ```ruby
 
@@ -410,6 +411,71 @@ tags are changed. Also, instead of using a valid ID value, any string
 can be assigned to the ID tag of a channel or feed, and if it doesn't
 start with "ESSID:" or "EVENTID:", it will be regenerated using that
 string as the key.
+
+### Parsing ESS files
+
+There is also an ESS::Parser class, which has one method "#parse"
+which accepts a string containing the ESS/XML document, or a File
+object. It parses the document and returns an ESS::ESS object,
+which represents the root elements of an ESS document.
+
+This object has methods which correspond to child tags, and each
+method retrieves another object which represents a child tag with
+that name, and which again has methods corresponding to its child
+elements. I believe it's all easier to understand from an example:
+
+```ruby
+
+ess = ESS::Parser.parse(xml_doc)
+
+# To retrieve a child tag, just use a method with the same name
+title_tag = ess.channel.title
+
+# To retrieve a tags text, use the #text! method
+title_text = title_tag.text!
+
+# Some tags car be repeated more then once. For that case the tag
+# objects accept tag_name_list methods, which return a list of child
+# tags named "tag_name", like this:
+feeds = ess.channel.feed_list
+feeds.each do |feed|
+  puts feed.title.text!
+end
+
+# For reading attribute values, the objects accept attr_name_attr
+# methods, for example, to retrieve the value of attribute "type" of
+# a "item" tag:
+item = feeds[0].dates.item_list[0]
+date_item_type = item.type_attr
+
+```
+
+#### find_coming and find_between
+
+To aid web developers who want to display events in a list or a
+calendar, the ESS::ESS objects returned by the parser have two
+additional methods: find_coming and find_between.
+
+find_coming tries to find the next N events for your event list.
+It returns a list of hashes, each hash representing one item for
+the list. The hash contains the :time and :feed keys, the former
+being the start time of the event, and the later the complete
+feed describing the whole event.
+
+find_coming accepts one parameter, which is the number of events
+it should return. The default is 10.
+
+find_between returns a list of all events between the two moments
+in time, which as specified as parameters with Time objects. For
+example, to retrieve all events in June 2013, run this:
+
+```ruby
+
+start_time = "2013-06-01 00:00"
+end_time = "2013-06-30 24:00"
+events = ess.find_between(start_time, end_time)
+
+```
 
 ## Contributing
 
