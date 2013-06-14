@@ -6,29 +6,31 @@ module ESS
       super :ess, DTD::ESS
     end
 
-    def find_coming n=10
+    def find_coming n=10, start_time=nil
+      start_time = Time.now if start_time.nil?
       feeds = []
       channel.feed_list.each do |feed|
         feed.dates.item_list.each do |item|
           if item.type_attr == "standalone"
             feeds << { :time => Time.parse(item.start.text!), :feed => feed }
           elsif item.type_attr == "recurrent"
-            moments = parse_recurrent_date_item(item, n)
+            moments = parse_recurrent_date_item(item, n, start_time)
             moments.each do |moment|
               feeds << { :time => moment, :feed => feed }
             end
           elsif item.type_attr == "permanent"
             start = Time.parse(item.start.text!)
-            if start > Time.now
+            if start > start_time
               feeds << { :time => start, :feed => feed }
             else
-              feeds << { :time => Time.now, :feed => feed }
+              feeds << { :time => start_time, :feed => feed }
             end
           else
             raise DTD::InvalidValueError, "the \"#{item.type_attr}\" is not valid for a date item type attribute"
           end
         end
       end
+      feeds = feeds.delete_if { |x| x[:time] < start_time }
       feeds.sort! { |x, y| x[:time] <=> y[:time] }
       return feeds[0..n-1]
     end
@@ -43,7 +45,7 @@ module ESS
               feeds << { :time => feed_start_time, :feed => feed }
             end
           elsif item.type_attr == "recurrent"
-            moments = parse_recurrent_date_item(item, end_time)
+            moments = parse_recurrent_date_item(item, end_time, start_time)
             moments.each do |moment|
               if moment.between?(start_time, end_time)
                 feeds << { :time => moment, :feed => feed }
@@ -86,7 +88,7 @@ module ESS
         "hour" => lambda { |time| inc_hour(time) }
       }
 
-      def parse_recurrent_date_item item, n_or_end_date
+      def parse_recurrent_date_item item, n_or_end_date, start_time
         current = first = Time.parse(item.start.text!)
         inc_period_func = INC_FUNCS[item.unit_attr || "hour"]
         interval = (item.interval_attr == "") ? 1 : item.interval_attr.to_i
@@ -96,6 +98,7 @@ module ESS
           while true
             parse_unit(item, current, all)
             interval.times do current = inc_period_func.call(current) end
+            all = all.delete_if { |x| x[:time] < start_time }
             break if break_func.call
           end
         else
@@ -104,7 +107,7 @@ module ESS
             interval.times do current = inc_period_func.call(current) end
           end
         end
-        all.delete_if { |time| time < first }
+        all = all.delete_if { |time| time < start_time || time < first }
       end
 
       def parse_unit item, current, all

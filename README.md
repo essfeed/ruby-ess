@@ -462,8 +462,10 @@ the list. The hash contains the :time and :feed keys, the former
 being the start time of the event, and the later the complete
 feed describing the whole event.
 
-find_coming accepts one parameter, which is the number of events
-it should return. The default is 10.
+find_coming accepts two parameters. The first parameter is the
+number of events it should return and the default is 10. The second
+parameter defaults to Time.now, and the method with return N events
+starting from the moment specified.
 
 find_between returns a list of all events between the two moments
 in time, which as specified as parameters with Time objects. For
