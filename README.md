@@ -19,6 +19,11 @@ Or install it yourself as:
 
     $ gem install ess -v 0.9.3
 
+## Information
+
+* RDoc documentation [available on RubyDoc.info](http://rubydoc.info/gems/ess/frames)
+* Source code [available on GitHub](http://github.com/essfeed/ruby-ess)
+
 ## Usage
 
 Producing your own ESS feeds is easy. Here is a rather extensive
