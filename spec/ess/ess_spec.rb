@@ -274,6 +274,77 @@ module ESS
           feeds[4][:time].should == Time.parse("#{future_year}-09-01 00:00")
         end
       end
+
+      describe "#find_between" do
+        it 'should return a list of feeds between the two dates it received as parameters' do
+          feeds = ess.find_between(Time.parse("#{future_year}-03-11 00:00"), Time.parse("#{future_year}-10-11 00:00"))
+          feeds.length.should == 3
+          feeds[0][:time].should == Time.parse("#{future_year}-05-01 00:00")
+          feeds[1][:time].should == Time.parse("#{future_year}-07-01 00:00")
+          feeds[2][:time].should == Time.parse("#{future_year}-09-01 00:00")
+        end
+      end
+    end
+
+    context 'feed with one item with recurring date with a limit attribute and a selected_day attribute' do
+      let(:ess) do
+        ess = ESS.new
+        ess.channel.add_feed do |feed|
+          feed.title "Feed 1"
+          feed.dates.add_item do |item|
+            item.type_attr "recurrent"
+            item.unit_attr "month"
+            item.limit_attr "5"
+            item.selected_day_attr "2"
+            item.name "Date 1"
+            item.start Time.parse("#{future_year}-01-02 00:00")
+          end
+        end
+        ess
+      end
+
+      describe "#find_coming" do
+        it 'should return events only on those days specified in the selected_day attribute' do
+          feeds = ess.find_coming
+          feeds.length.should == 5
+          feeds[0][:time].should == Time.parse("#{future_year}-01-02 00:00")
+          feeds[1][:time].should == Time.parse("#{future_year}-02-02 00:00")
+          feeds[2][:time].should == Time.parse("#{future_year}-03-02 00:00")
+          feeds[3][:time].should == Time.parse("#{future_year}-04-02 00:00")
+          feeds[4][:time].should == Time.parse("#{future_year}-05-02 00:00")
+        end
+
+        it 'should support using day names' do
+          ess.channel.feed.dates.item.selected_day_attr "monday"
+          feeds = ess.find_coming(30)
+          feeds.length.should be > 19
+          feeds.length.should be < 26
+          feeds.each do |event|
+            event[:time].wday.should == 1
+          end
+        end
+      end
+
+      describe "#find_between" do
+        it 'should return events only on those days specified in the selected_day attribute' do
+          feeds = ess.find_between(Time.parse("#{future_year}-01-05 00:00"), Time.parse("#{future_year}-04-06 00:00"))
+          feeds.length.should == 3
+          feeds[0][:time].should == Time.parse("#{future_year}-02-02 00:00")
+          feeds[1][:time].should == Time.parse("#{future_year}-03-02 00:00")
+          feeds[2][:time].should == Time.parse("#{future_year}-04-02 00:00")
+        end
+
+        it 'should support using day names' do
+          ess.channel.feed.dates.item.selected_day_attr "monday"
+          feeds = ess.find_between(Time.parse("#{future_year}-02-01 00:00"), Time.parse("#{future_year}-04-30 00:00"))
+          feeds.length.should be > 11
+          feeds.length.should be < 16
+          feeds.each do |event|
+            event[:time].wday.should == 1
+          end
+        end
+      end
+
     end
   end
 end

@@ -13,10 +13,16 @@ module ESS
           if item.type_attr == "standalone"
             feeds << { :time => Time.parse(item.start.text!), :feed => feed }
           elsif item.type_attr == "recurrent"
-            moments = parse_recurrent_date_item(item)
-            moments.sort! { |x, y| x <=> y }
+            moments = parse_recurrent_date_item(item, n)
             moments.each do |moment|
               feeds << { :time => moment, :feed => feed }
+            end
+          elsif item.type_attr == "permanent"
+            start = Time.parse(item.start.text!)
+            if start > Time.now
+              feeds << { :time => start, :feed => feed }
+            else
+              feeds << { :time => Time.now, :feed => feed }
             end
           else
             raise DTD::InvalidValueError, "the \"#{item.type_attr}\" is not valid for a date item type attribute"
@@ -27,7 +33,7 @@ module ESS
       return feeds[0..n-1]
     end
 
-    def find_between start_time, end_time
+    def find_between start_time, end_time, max_events=1000
       feeds = []
       channel.feed_list.each do |feed|
         feed.dates.item_list.each do |item|
@@ -37,10 +43,19 @@ module ESS
               feeds << { :time => feed_start_time, :feed => feed }
             end
           elsif item.type_attr == "recurrent"
-            moments = parse_recurrent_date_item(item)
+            moments = parse_recurrent_date_item(item, max_events)
             moments.each do |moment|
               if moment.between?(start_time, end_time)
                 feeds << { :time => moment, :feed => feed }
+              end
+            end
+          elsif item.type_attr == "permanent"
+            start = Time.parse(item.start.text!)
+            unless start > end_time
+              if start > start_time
+                feeds << { :time => start, :feed => feed }
+              else
+                feeds << { :time => start_time, :feed => feed }
               end
             end
           else
@@ -52,39 +67,154 @@ module ESS
     end
 
     private
-   
-      def parse_recurrent_date_item item
-        first = Time.parse(item.start.text!)
-        limit = item.limit_attr.to_i
-        all = [first]
-        (2..limit).each do |n|
-          all << calc_nth_event(n, first, item.unit_attr, item.interval_attr)
+
+      WEEK_DAYS = {
+        'monday' => 1,
+        'tuesday' => 2,
+        'wednesday' => 3,
+        'thursday' => 4,
+        'friday' => 5,
+        'saturday' => 6,
+        'sunday' => 7
+      }
+
+      INC_FUNCS = {
+        "year" => lambda { |time| inc_year(time) },
+        "month" => lambda { |time| inc_month(time) },
+        "week" => lambda { |time| inc_week(time) },
+        "day" => lambda { |time| inc_day(time) },
+        "hour" => lambda { |time| inc_hour(time) }
+      }
+
+      def parse_recurrent_date_item item, n
+        current = first = Time.parse(item.start.text!)
+        inc_period_func = INC_FUNCS[item.unit_attr || "hour"]
+        interval = (item.interval_attr == "") ? 1 : item.interval_attr.to_i
+        all = []
+        if item.limit_attr.length == 0
+          while true
+            parse_unit(item, current, all)
+            interval.times do current = inc_period_func.call(current) end
+            break if all.length >= n
+          end
+        else
+          item.limit_attr.to_i.times do
+            parse_unit(item, current, all)
+            interval.times do current = inc_period_func.call(current) end
+          end
         end
-        all
+        all.delete_if { |time| time < first }
       end
 
-      def calc_nth_event n, first, unit, interval
-        next_event = first
-        interval = 1 if interval.empty?
-        repeat = (n-1) * interval.to_i
-        case unit
+      def parse_unit item, current, all
+        case item.unit_attr.downcase
         when "year"
-          repeat.times { next_event = inc_year(next_event) }
+          all << current
         when "month"
-          repeat.times { next_event = inc_month(next_event) }
+          weeks = item.selected_week_attr.downcase.split(",")
+          days = item.selected_day_attr.downcase.split(",")
+          if weeks.any?
+            if days.none?
+              days = WEEK_DAYS.keys
+            end
+          end
+          if weeks.none?
+            if days.any?
+              weeks = ["first", "second", "third", "fourth", "last"]
+            end
+          end
+          if days.any?
+            days.each do |day|
+              if WEEK_DAYS.include? day
+                parse_month_week_day(day, current, weeks, all)
+              elsif day.to_i.to_s == day
+                parse_month_day(day, current, all)
+              else
+                raise InvalidValueError, "the \"#{day}\" value is not valid for a date item selected_day attribute"
+              end
+            end
+          else
+            all << current
+          end
         when "week"
-          repeat.times { next_event = inc_week(next_event) }
+          days = item.selected_day_attr.split(",")
+          if days.none?
+            all << current
+          else
+            days.each { |day| parse_week_day(day, current, all) }
+          end
         when "day"
-          repeat.times { next_event = inc_day(next_event) }
+          all << current
         when "hour"
-          repeat.times { next_event = inc_hour(next_event) }
+          all << current
         else
           raise InvalidValueError, "the \"#{item.unit_attr}\" is not valid for a date item unit attribute"
         end
-        return next_event
       end
 
-      def inc_year time
+      def parse_month_week_day day, current, weeks, all
+        weeks.each do |week|
+          case week
+          when "first"
+            current = change_time(current, :day => 1)
+          when "second"
+            current = change_time(current, :day => 8)
+          when "third"
+            current = change_time(current, :day => 15)
+          when "fourth"
+            current = change_time(current, :day => 22)
+          when "last"
+            current = change_time(current, :day => (days_in_month(current) - 6))
+          else
+            raise InvalidValueError, "the \"#{item.unit_attr}\" is not valid for a date item unit attribute"
+          end
+          all << change_time(current, :day => ((7+ WEEK_DAYS[day] - current.wday) % 7 + current.day))
+        end
+      end
+
+      def change_time time, options
+        sec = options[:sec] || time.sec
+        min = options[:min] || time.min
+        hour = options[:hour] || time.hour
+        day = options[:day] || time.day
+        month = options[:month] || time.month
+        year = options[:year] || time.year
+        time.class.new(year, month, day, hour, min, sec, time.utc_offset)
+      end
+
+      def days_in_month time
+        case time.month
+        when 1, 3, 5, 7, 8, 10, 12
+          31
+        when 2
+          if time.year % 4 == 0
+            29
+          else
+            28
+          end
+        when 4, 6, 9, 11
+          30
+        end
+      end
+
+      def parse_month_day day, current, all
+        all << change_time(current, :day => day)
+      end
+
+      def parse_week_day day, current, all
+        day = day.downcase
+        current_wday = current.wday
+        current_wday = 7 if current_wday = 0
+        if WEEK_DAYS.keys.include? day
+          all << change_time(current, :day => (current.day + WEEK_DAYS[day] - current_wday))
+        elsif day.to_i.to_s == day
+          all << change_time(current, :day => (current.day + day.to_i - current_wday))
+        else
+          raise InvalidValueError, "the \"#{day}\" value is not valid for a date item selected_day attribute"
+        end
+      end
+
+      def self.inc_year time
         if time.year % 4 == 0
           time + 60*60*24*366
         else
@@ -92,7 +222,7 @@ module ESS
         end
       end
 
-      def inc_month time
+      def self.inc_month time
         increment = nil
         if time.month == 2
           if time.year % 4 == 0
@@ -108,19 +238,19 @@ module ESS
         fix_for_dst(time, time + increment)
       end
 
-      def inc_week time
+      def self.inc_week time
         fix_for_dst(time, time + 60*60*24*7)
       end
 
-      def inc_day
+      def self.inc_day
         fix_for_dst(time, time + 60*60*24)
       end
 
-      def inc_hour
+      def self.inc_hour
         kime + 3600
       end
 
-      def fix_for_dst original_time, new_time
+      def self.fix_for_dst original_time, new_time
         if original_time.hour != new_time.hour
           new_time = new_time + (original_time.hour - new_time.hour) * 3600
         end
@@ -129,7 +259,6 @@ module ESS
         end
         new_time
       end
-
   end
 end
 
