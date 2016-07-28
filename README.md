@@ -230,7 +230,7 @@ be found on http://essfeed.org/ .
 ### Pushing feeds to aggregators
 
 Once a feed is generated, it can be submitted to an aggregator easily.
-To send it to the default aggregator service, which is Hypecal, just
+To send it to the default aggregator service, which is Robby, just
 add an option to the 'make' class method:
 
 ```ruby
@@ -496,7 +496,7 @@ events = ess.find_between(start_time, end_time)
 
 (The MIT License)
 
-Copyright (c) 2013 Hypecal
+Copyright (c) 2013 Robby
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

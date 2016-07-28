@@ -17,7 +17,7 @@ module ESS
     # Returns the aggregator services currently set as default.
     #
     def self.aggregators
-      @@aggregators ||= ["http://api.hypecal.com/v1/ess/aggregator.json"]
+      @@aggregators ||= ["http://www.robby.ai/api/v1/ess/aggregator.json"]
     end
 
     ##
